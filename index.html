@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8"><title>Win Edu Adventure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#f4efe4;--card:#fff;--ink:#1b2a41;--gold:#b8860b;--ln:#d9cfb8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1626;--card:#18223a;--ink:#f1ece0;--gold:#e0b84c;--ln:#33415f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1626;--card:#18223a;--ink:#f1ece0;--gold:#e0b84c;--ln:#33415f;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Poppins","Segoe UI",Roboto,Helvetica,Arial,sans-serif;min-height:100vh}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;margin:.3em 0}
+h1{font-size:clamp(26px,5vw,42px);color:var(--gold);letter-spacing:.5px}
+.scr{display:none;max-width:900px;margin:0 auto;padding:18px}.scr.on{display:block}#game{max-width:1920px;padding:6px}#home{background:color-mix(in srgb,var(--bg) 84%,transparent);backdrop-filter:blur(8px);border-radius:18px;margin:14px auto}
+.lbl{font-size:12px;letter-spacing:2px;text-transform:uppercase;opacity:.7;margin:18px 0 6px;text-align:left}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--card);color:var(--ink);border:1.5px solid var(--ln);border-radius:10px;padding:10px 14px;font:600 15px inherit;font-family:inherit;cursor:pointer;transition:.15s}
+.chip:hover{border-color:var(--gold)}.chip.on{background:var(--gold);color:#fff;border-color:var(--gold);box-shadow:0 4px 14px rgba(0,0,0,.2)}
+#subs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}#subs .chip{width:100%;min-height:76px;padding:12px 6px;font-size:16px;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.25}@media(max-width:700px){#subs{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:420px){#subs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+#cp{background:var(--card);border:1.5px solid var(--ln);border-left:5px solid var(--gold);border-radius:12px;padding:14px 18px;text-align:left;line-height:1.55}
+#cp p{margin:6px 0;font-size:14.5px}.tp span{display:inline-block;background:rgba(184,134,11,.15);border-radius:20px;padding:3px 10px;margin:3px 4px 0 0;font-size:13px}
+.go{margin-top:22px;background:var(--gold);color:#fff;border:0;border-radius:12px;padding:14px 34px;font:700 18px inherit;font-family:inherit;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.go.g{background:#5c6b82;font-size:15px;padding:10px 18px;margin:8px 4px 0}
+#wrap{position:relative;max-width:1900px;margin:0 auto}
+canvas{width:100%;display:block;border-radius:14px;border:2px solid var(--ln);background:#000;touch-action:none}
+#hud{position:absolute;left:10px;top:8px;right:64px;display:flex;justify-content:space-between;color:#fff;font-weight:700;font-size:15px;text-shadow:0 2px 4px #000;pointer-events:none}
+#toast{position:absolute;left:0;right:0;top:45%;text-align:center;color:#fff;font:700 22px Georgia,serif;text-shadow:0 2px 6px #000;opacity:0;transition:opacity .3s;pointer-events:none}
+#ctl{display:flex;justify-content:space-between;gap:8px;max-width:1500px;margin:8px auto}
+#ctl button{flex:1;font-size:22px;padding:14px;border-radius:12px;border:0;background:var(--card);color:var(--ink);border:1.5px solid var(--ln);touch-action:none;user-select:none}
+.ov{position:fixed;inset:0;background:rgba(5,10,25,.78);display:none;align-items:center;justify-content:center;z-index:9;padding:14px;overflow:auto}.ov.on{display:flex}
+.box{background:var(--card);color:var(--ink);border-radius:16px;padding:20px;max-width:620px;width:100%;border:2px solid var(--gold);text-align:left}
+.st{background:rgba(184,134,11,.12);border-left:4px solid var(--gold);padding:10px 14px;border-radius:8px;font-size:15px;line-height:1.55;margin:8px 0}
+.tag{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);font-weight:700}
+.opt{display:block;width:100%;margin:7px 0;padding:11px 14px;font:16px inherit;font-family:inherit;text-align:left;border-radius:10px;border:1.5px solid var(--ln);background:transparent;color:inherit;cursor:pointer}
+.opt:hover{border-color:var(--gold)}.opt.ok{background:#2e7d32;color:#fff}.opt.no{background:#c62828;color:#fff}
+.hint{font-size:13px;opacity:.75;margin-top:8px}
+.spin{width:54px;height:54px;margin:4px auto 10px;border:6px solid var(--ln);border-top-color:var(--gold);border-radius:50%;animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+.bar{height:8px;background:var(--ln);border-radius:6px;overflow:hidden;margin:10px 0}.bar i{display:block;height:100%;width:40%;background:var(--gold);border-radius:6px;animation:bs 1.4s ease-in-out infinite}@keyframes bs{0%{margin-left:-40%}100%{margin-left:100%}}
+.step{font-weight:600;margin:6px 0;min-height:1.4em}
+#wrap{--u:6px}
+#jsb{position:absolute;left:2.5%;bottom:5%;width:calc(var(--u)*17);height:calc(var(--u)*17);border-radius:50%;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.55);touch-action:none}
+#jsk{position:absolute;left:50%;top:50%;width:46%;height:46%;margin:-23%;border-radius:50%;background:rgba(255,255,255,.8);box-shadow:0 3px 8px rgba(0,0,0,.4);pointer-events:none}
+.cb{position:absolute;border-radius:50%;border:2px solid rgba(255,255,255,.7);color:#fff;font-size:calc(var(--u)*5);touch-action:none;user-select:none;width:calc(var(--u)*11);height:calc(var(--u)*11);box-shadow:0 4px 10px rgba(0,0,0,.4);cursor:pointer;padding:0;line-height:1}
+#bj{right:2.5%;bottom:5%;background:rgba(30,136,229,.75)}
+#bf{right:calc(2.5% + var(--u)*11 + var(--u)*2);bottom:calc(5% + var(--u)*3);background:rgba(229,57,53,.78)}
+#bh{position:absolute;top:8px;right:10px;width:calc(var(--u)*7);height:calc(var(--u)*7);min-width:34px;min-height:34px;border-radius:50%;border:2px solid rgba(255,255,255,.75);background:rgba(20,30,60,.7);font-size:calc(var(--u)*3.6);cursor:pointer;z-index:3;padding:0;line-height:1}
+details#man{margin-top:10px;text-align:left;background:var(--card);border:1.5px solid var(--ln);border-radius:12px;padding:10px 14px}
+details summary{cursor:pointer;font-weight:700}
+.mf input,.mf textarea{width:100%;margin:5px 0;padding:9px 10px;border-radius:8px;border:1.5px solid var(--ln);background:transparent;color:var(--ink);font-size:14px;font-family:inherit}
+.mi{font-size:13px;padding:4px 0;border-top:1px solid var(--ln)}.mi button{border:0;background:none;cursor:pointer}
+
+/* ===== Tampilan 3D elegan beranda ===== */
+:root{--sh:color-mix(in srgb,var(--ln) 70%,#000)}
+h1,h2,h3{font-family:'Cinzel','Georgia',serif;font-weight:700}
+h1{font-family:'Cinzel Decorative','Cinzel',Georgia,serif;font-weight:900;font-size:clamp(30px,6.2vw,58px);letter-spacing:4px;margin:.15em 0 .1em;line-height:1.1;background:linear-gradient(180deg,#fff6bf 0%,#f7cf4a 42%,#c28f10 52%,#7a5200 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;filter:drop-shadow(0 1px 0 #5a3d00) drop-shadow(0 2px 0 #52380a) drop-shadow(0 3px 0 #4a3200) drop-shadow(0 4px 0 #3d2900) drop-shadow(0 9px 10px rgba(0,0,0,.45))}
+.sub{font-family:'Poppins',sans-serif;font-weight:500;font-size:clamp(13px,2.2vw,16px);letter-spacing:.6px;opacity:.85;margin-bottom:4px}
+.lbl{font-family:'Cinzel',serif;font-weight:700;font-size:13px;letter-spacing:2.5px;opacity:.9;color:var(--gold);text-shadow:0 1px 0 rgba(255,255,255,.5)}
+#home{perspective:1200px;border:1.5px solid color-mix(in srgb,var(--gold) 45%,transparent);box-shadow:0 2px 0 rgba(255,255,255,.55) inset,0 14px 0 -6px color-mix(in srgb,var(--bg) 60%,#000),0 28px 50px rgba(0,0,0,.4);padding:22px 20px 26px}
+.chip{font-family:'Poppins',sans-serif;font-weight:600;border:1.5px solid var(--ln);background:linear-gradient(180deg,color-mix(in srgb,var(--card) 70%,#fff),var(--card) 55%,color-mix(in srgb,var(--card) 90%,var(--ln)));box-shadow:0 5px 0 var(--sh),0 9px 14px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.85);transform:translateY(0);transition:transform .12s,box-shadow .12s,border-color .15s}
+.chip:hover{transform:translateY(-2px);box-shadow:0 7px 0 var(--sh),0 13px 18px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.85)}
+.chip:active{transform:translateY(4px);box-shadow:0 1px 0 var(--sh),0 3px 6px rgba(0,0,0,.3)}
+.chip.on{background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 65%,#fff),var(--gold) 55%,color-mix(in srgb,var(--gold) 78%,#000));color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.45);border-color:color-mix(in srgb,var(--gold) 70%,#000);transform:translateY(3px);box-shadow:0 2px 0 color-mix(in srgb,var(--gold) 55%,#000),0 5px 10px rgba(0,0,0,.3),inset 0 2px 4px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.4)}
+#cp,details#man{background:linear-gradient(180deg,color-mix(in srgb,var(--card) 80%,#fff),var(--card));box-shadow:0 6px 0 var(--sh),0 14px 24px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.8);font-family:'Poppins',sans-serif}
+#cp h3{font-size:19px;color:var(--gold);text-shadow:0 1px 0 rgba(255,255,255,.5)}
+.tp span{box-shadow:0 2px 0 rgba(184,134,11,.35);font-weight:500}
+details summary{font-family:'Cinzel',serif;font-size:15px}
+.mf input,.mf textarea{background:color-mix(in srgb,var(--card) 92%,#000);box-shadow:inset 0 2px 4px rgba(0,0,0,.18)}
+.go{font-family:'Cinzel',serif;font-weight:800;letter-spacing:2px;background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 62%,#fff),var(--gold) 52%,color-mix(in srgb,var(--gold) 75%,#000));text-shadow:0 1px 2px rgba(0,0,0,.45);border:1.5px solid color-mix(in srgb,var(--gold) 65%,#000);box-shadow:0 7px 0 color-mix(in srgb,var(--gold) 50%,#000),0 14px 22px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.5);transition:transform .12s,box-shadow .12s}
+.go:hover{transform:translateY(-2px)}.go:active{transform:translateY(6px);box-shadow:0 1px 0 color-mix(in srgb,var(--gold) 50%,#000),0 4px 8px rgba(0,0,0,.35)}
+.go.g{background:linear-gradient(180deg,#8393ab,#5c6b82 55%,#46536a);box-shadow:0 5px 0 #34405a,0 10px 16px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.35);font-family:'Poppins',sans-serif;letter-spacing:.5px;font-weight:600}
+.box{background:linear-gradient(180deg,color-mix(in srgb,var(--card) 85%,#fff),var(--card));box-shadow:0 8px 0 var(--sh),0 24px 44px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.7);font-family:'Poppins',sans-serif}
+.opt{background:linear-gradient(180deg,color-mix(in srgb,var(--card) 80%,#fff),var(--card));box-shadow:0 3px 0 var(--sh),inset 0 1px 0 rgba(255,255,255,.7);font-family:'Poppins',sans-serif;transition:transform .1s}
+.opt:active{transform:translateY(2px)}
+</style></head><body>
+<canvas id="hb" style="position:fixed;inset:0;width:100%;height:100%;z-index:-1;border:0;border-radius:0;background:none"></canvas>
+
+<div id="home" class="scr on" style="text-align:center">
+  <h1>WIN EDU ADVENTURE</h1>
+  <div class="sub">Jelajahi dunia, kumpulkan koin, dan selesaikan misi soal literasi &amp; numerasi</div>
+  <div class="lbl">1 · Jenjang &amp; Kelas</div><div class="row" id="lvs"></div>
+  <div class="lbl">2 · Mata Pelajaran</div><div class="row" id="subs"></div>
+  <div class="lbl">3 · Capaian Pembelajaran (pilih satu atau semua)</div><div class="row" id="cps"></div><div id="cp" style="margin-top:8px"></div>
+  <div class='lbl'>4 · Topik (boleh pilih lebih dari satu)</div><div class='row' id='tps'></div><details id='man'><summary>✍️ Tambah topik &amp; soal manual</summary><div class='mf'><input id='mt' list='tl' placeholder='Topik (ketik topik baru atau pilih)'><datalist id='tl'></datalist><textarea id='ms' rows='2' placeholder='Stimulus narasi (opsional)'></textarea><input id='mq' placeholder='Pertanyaan'><input id='m0' placeholder='Pilihan A — JAWABAN BENAR'><input id='m1' placeholder='Pilihan B'><input id='m2' placeholder='Pilihan C'><input id='m3' placeholder='Pilihan D'><button class='go g' onclick='addM()'>➕ Tambah Soal</button><div id='ml'></div></div></details><div class='lbl'>5 · Tingkat Kesulitan</div><div class='row' id='dfs'></div><div class='lbl'>6 · Jumlah Soal (maks. 20)</div><div class='row' id='nqs'></div>
+  <div class='lbl'>7 · Dunia Petualangan</div><div class="row" id="ths"></div>
+  <button class="go" onclick="start()">▶ Mulai Misi</button>
+  <p class="hint">← → / A D bergerak · Spasi / ↑ melompat · F / tombol 🔥 menembak bola api, joystick untuk bergerak · di Luar Angkasa, Bulan &amp; Dalam Laut gravitasi ringan: tekan lompat lagi di udara untuk melayang/berenang · injak/tembak musuh (termasuk kelelawar 🦇 &amp; elang 🦅) · sentuh kotak ? untuk soal · kalahkan Raja Naga 🐉 di akhir</p>
+</div>
+
+<div id="game" class="scr">
+  <div id="wrap"><canvas id="cv"></canvas><div id="hud"><span id="h1"></span><span id="h2"></span></div><div id="toast">Jawab semua kotak ? dulu!</div><div id="jsb"><div id="jsk"></div></div><button id="bf" class="cb">🔥</button><button id="bj" class="cb">↑</button><button id="bh" onclick="quit()" title="Beranda">🏠</button></div>
+  
+  
+</div>
+
+<div class="ov" id="qm"><div class="box"><div class="tag" id="qt"></div><div class="st" id="qs"></div><h3 id="qq" style="font-size:19px"></h3><div id="qo"></div><div class="hint" id="qf"></div></div></div>
+<div class="ov" id="gl"><div class="box" style="text-align:center"><div class="spin"></div><h3 id="gt"></h3><div class="bar"><i></i></div><div class="step" id="gs"></div><div class="hint">Claude sedang menulis soal khusus sesuai CP dan topik yang kamu pilih. Proses ini bisa 10–60 detik. Jika diminta izin, pilih Izinkan.</div><button class="go g" onclick="CT&&CT.abort()">Batal, pakai bank soal</button></div></div>
+<div class="ov" id="rs"><div class="box" style="text-align:center"><h2 id="rt"></h2><p id="rp" style="font-size:18px;line-height:1.7"></p>
+  <button class="go g" onclick="start()">🔁 Main Lagi</button><button class="go g" onclick="quit()" title="Beranda" aria-label="Beranda">🏠</button></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const $=id=>document.getElementById(id),R=n=>Math.floor(Math.random()*n);
+const shuf=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
+const LVN=['SD · Kelas 1–6','SMP · Kelas 7–9','SMA · Kelas 10–12'],DFN=['😊 Mudah','🙂 Sedang','🔥 Sulit'];
+const SUB=[{n:'Matematika',e:'➗'},{n:'Bahasa Indonesia',e:'📖'},{n:'IPA',e:'🔬'},{n:'IPS',e:'🌏'},{n:'Bahasa Inggris',e:'🔤'}];
+const TH=[
+{n:'Hutan',e:'🌳',s:['#8fd0ff','#e3f4d2'],g:'#4f7f35',fog:'#cfe8d0',k:'forest',en:'#8d5a3b',gr:.55,big:1},
+{n:'Luar Angkasa',e:'🪐',s:['#03030f','#2a1458'],g:'#37474f',fog:'#0a0a24',k:'space',en:'#7e57c2',gr:.16},
+{n:'Bulan',e:'🌙',s:['#02030a','#1c2230'],g:'#9a9a9a',fog:'#10131c',k:'moon',en:'#b0bec5',gr:.2,big:1},
+{n:'Kota',e:'🏙️',s:['#f7b267','#9fd3f5'],g:'#4a4f57',fog:'#c9d6e3',k:'city',en:'#e53935',gr:.55,big:1},
+{n:'Pantai',e:'🏖️',s:['#4fc3f7','#fff4cf'],g:'#e3c98a',fog:'#d7f0fa',k:'beach',en:'#ef6c00',gr:.55,big:1},
+{n:'Dalam Laut',e:'🐠',s:['#0b6fb3','#031e3d'],g:'#8d6e4a',fog:'#0a4a7a',k:'sea',en:'#78909c',gr:.1,big:1},
+{n:'Langit Berawan',e:'☁️',s:['#3b8fe8','#eaf5ff'],g:'#f4f8ff',fog:'#dcecff',k:'sky',en:'#ffffff',gr:.5}];
+const CP=[
+[["Fase C: bilangan sampai 1.000.000 dan operasi hitung, KPK &amp; FPB, pecahan &amp; desimal, pola bilangan, rasio, keliling dan luas bangun datar, sudut, data &amp; peluang sederhana.","Bilangan &amp; operasi · KPK-FPB · Pecahan · Keliling &amp; luas · Diagram batang"],
+ ["Fase D: bilangan bulat, rasional, berpangkat &amp; notasi ilmiah; rasio &amp; proporsi; bentuk aljabar, persamaan linear, relasi &amp; fungsi; luas &amp; volume bangun ruang; Pythagoras; mean-median-modus &amp; peluang.","Rasio &amp; proporsi · Aljabar · Fungsi linear · Luas &amp; volume · Pythagoras · Statistika"],
+ ["Fase E–F: bilangan berpangkat, fungsi kuadrat &amp; eksponensial, trigonometri, statistika (box plot, regresi), barisan &amp; deret, bunga majemuk, peluang.","Eksponen · Fungsi kuadrat · Trigonometri · Barisan &amp; deret · Statistika · Peluang"]],
+[["Fase C: menganalisis informasi teks aural dan visual; membaca fasih dan menemukan nilai dalam teks sastra/nonsastra; mempresentasikan gagasan efektif &amp; santun; menulis kalimat kompleks bermakna denotatif-konotatif.","Ide pokok · Pesan &amp; nilai · Denotatif-konotatif · Presentasi · Menulis"],
+ ["Fase D: menganalisis gagasan, pandangan, pesan; menemukan makna tersurat-tersirat; mengevaluasi kredibilitas teks; mempresentasikan usul dan solusi; menulis logis, kritis, kreatif.","Tersurat-tersirat · Kredibilitas teks · Pro-kontra · Teks multimodal · Menulis kreatif"],
+ ["Fase E–F: mengevaluasi gagasan &amp; kredibilitas berbagai teks, membandingkan isi teks, mempresentasikan secara sistematis dan kritis, menulis serta memublikasikan karya.","Evaluasi teks · Perbandingan teks · Argumentasi · Sastra · Publikasi karya"]],
+[["Ringkasan umum IPAS SD (belum ada di PDF unggahan): wujud zat &amp; perubahannya, makhluk hidup &amp; lingkungan, gaya &amp; energi, bumi &amp; antariksa.","Wujud zat · Makhluk hidup · Energi · Bumi &amp; antariksa"],
+ ["Fase D: klasifikasi &amp; perubahan materi, sistem organ, interaksi makhluk hidup dan lingkungan (perubahan iklim), gaya &amp; tekanan, usaha-energi, kalor, gelombang, listrik-magnet, tata surya.","Klasifikasi materi · Sistem organ · Perubahan iklim · Kalor · Gelombang · Listrik · Tata surya"],
+ ["Fase E: klasifikasi &amp; keanekaragaman hayati, ekosistem, pengukuran, gerak 2 dimensi, energi alternatif, partikel materi &amp; stoikiometri, perubahan iklim. Fase F: Fisika, Kimia, Biologi.","Ekosistem · Energi alternatif · Stoikiometri · Gerak · Perubahan iklim"]],
+[["Ringkasan umum IPAS SD (belum ada di PDF unggahan): lingkungan sekitar, kegiatan ekonomi, keberagaman budaya, peristiwa sejarah lokal.","Kegiatan ekonomi · Keberagaman · Peta &amp; lingkungan · Sejarah lokal"],
+ ["Fase D: keberagaman geografis &amp; sumber daya alam, perubahan iklim &amp; mitigasi bencana, kegiatan ekonomi-harga-pasar, interaksi sosial &amp; integrasi bangsa, konsep dasar sejarah, jalur rempah.","Geografi Indonesia · Iklim &amp; bencana · Pasar &amp; harga · Interaksi sosial · Sejarah"],
+ ["Fase E: geografi fisik &amp; SIG, hakikat ekonomi &amp; produk keuangan, sosiologi &amp; masyarakat multikultural, penelitian sejarah masa Hindu-Buddha hingga kerajaan Islam.","Geospasial · Keuangan · Sosiologi · Multikultural · Sejarah kerajaan"]],
+[["Fase B–C (setara CEFR A1): memahami dan merespons teks lisan, tulis, atau multimodal sederhana tentang kehidupan sehari-hari; mengomunikasikan ide dan pengalaman dalam teks tulis sederhana.","Greetings and introduction · Family and friends · Daily routines · Numbers and colors · Animals and food"],
+ ["Fase D (setara A2): memahami alur informasi serta informasi tersurat dan tersirat teks lisan/tulis; mengungkapkan gagasan dengan kalimat sederhana dan majemuk; mengungkapkan pendapat dan mempertahankan argumen.","Descriptive text · Recount · Procedure · Announcement · Tenses"],
+ ["Fase E–F (setara B1–B2): menganalisis, menyimpulkan, dan mengevaluasi informasi tersurat-tersirat teks fiksi dan nonfiksi; menyampaikan pendapat dan mempertahankan argumen tentang isu terkini.","Narrative · Exposition · Discussion · Current issues · Conditional sentences"]]];
+const Q=[0,
+[["Setiap pagi Rani menyiram bunga di kebun sekolah. Daun kering ia kumpulkan untuk dibuat pupuk kompos. Kini kebun itu penuh bunga, dan teman-temannya ikut merawatnya.",[["Apa yang dilakukan Rani setiap pagi?",["Menyiram bunga","Menanam pohon","Menyapu kelas","Membaca buku"]],["Mengapa teman-teman Rani ikut merawat kebun?",["Mereka tertarik melihat hasil kerja Rani","Mereka disuruh kepala sekolah","Mereka ingin bermain","Mereka dibayar"]],["Pesan yang paling tepat dari teks adalah...",["Kebiasaan baik yang dilakukan terus-menerus dapat menginspirasi orang lain","Bunga harus disiram malam hari","Sampah tidak boleh disentuh","Kebun harus dibuat sangat luas"]]]],
+ ["Sebuah SMP meluncurkan gerakan membawa tumbler. Dalam sebulan, sampah botol plastik turun dari 120 menjadi 45 buah per hari. Kepala sekolah menyatakan gerakan ini berhasil karena diawali teladan para guru.",[["Berapa jumlah sampah botol per hari setelah gerakan berjalan?",["45 buah","120 buah","75 buah","165 buah"]],["Gagasan utama teks tersebut adalah...",["Gerakan tumbler menurunkan sampah botol plastik di sekolah","Guru wajib membeli botol baru","Sampah plastik tidak berbahaya","Kepala sekolah melarang semua plastik"]],["Klaim bahwa keberhasilan disebabkan teladan guru paling tepat dikritisi dengan...",["Menanyakan data pembanding dan faktor lain yang mungkin berpengaruh","Menerimanya karena diucapkan kepala sekolah","Menolaknya karena guru tidak berperan","Mengabaikan angka penurunan sampah"]]]],
+ ["Penggunaan AI untuk mengerjakan tugas dinilai mempercepat pekerjaan. Namun, seorang pengamat pendidikan memperingatkan bahwa siswa kehilangan latihan bernalar jika menyalin jawaban AI tanpa memeriksanya. Ia menyarankan AI dipakai sebagai mitra diskusi, bukan pengganti berpikir.",[["Apa kekhawatiran pengamat pendidikan dalam teks?",["Siswa kehilangan latihan bernalar","AI terlalu mahal","Tugas menjadi terlalu sedikit","Guru kehilangan pekerjaan"]],["Kalimat terakhir teks berfungsi sebagai...",["Rekomendasi atau saran","Definisi istilah","Data pendukung","Pengalaman pribadi"]],["Data manakah yang paling kuat mendukung peringatan pengamat?",["Penelitian yang membandingkan kemampuan bernalar siswa pengguna dan bukan pengguna AI","Jumlah unduhan aplikasi AI","Pendapat satu siswa","Harga langganan AI"]]]]],
+[["Dini menaruh es batu di gelas pada siang terik. Beberapa menit kemudian es mencair, dan permukaan luar gelas basah oleh tetesan air walaupun gelas tidak bocor.",[["Mengapa es batu mencair?",["Menyerap kalor dari udara sekitar","Melepas kalor ke udara","Terkena angin dingin","Karena gelas bergetar"]],["Tetesan air di luar gelas berasal dari...",["Uap air di udara yang mengembun","Es yang menembus gelas","Keringat gelas","Air hujan"]],["Agar es lebih lama tidak mencair, tindakan paling tepat adalah...",["Menyimpannya dalam wadah penahan panas","Menaruhnya di bawah matahari","Mengaduknya terus-menerus","Menuangkan air hangat"]]]],
+ ["Sekolah mengukur suhu pukul 12.00. Lapangan beton menunjukkan 38°C, sedangkan taman dengan pohon rindang 30°C. Siswa menyimpulkan bahwa pohon membuat udara lebih sejuk.",[["Berapa selisih suhu lapangan beton dan taman?",["8°C","6°C","10°C","68°C"]],["Pohon membantu menurunkan suhu karena...",["Memberi naungan dan melepas uap air melalui daun","Menyerap seluruh cahaya matahari","Menghasilkan kalor","Mengubah beton menjadi dingin"]],["Kelemahan penyelidikan siswa tersebut adalah...",["Pengukuran hanya satu waktu dan satu titik sehingga bukti belum cukup kuat","Memakai termometer","Mengukur pada siang hari","Membandingkan dua tempat"]]]],
+ ["Sebuah rumah memasang panel surya yang menghasilkan 8 kWh per hari, sedangkan kebutuhan listrik rumah 10 kWh per hari. Pemilik rumah ingin sepenuhnya mandiri energi.",[["Berapa kekurangan energi per hari?",["2 kWh","8 kWh","10 kWh","18 kWh"]],["Jika hanya kebutuhan yang dikurangi, penghematan minimal agar mandiri adalah...",["20% dari kebutuhan","8% dari kebutuhan","10% dari kebutuhan","80% dari kebutuhan"]],["Solusi yang paling logis untuk mencapai mandiri energi adalah...",["Menambah kapasitas panel, menghemat pemakaian, dan memakai baterai penyimpan","Mematikan seluruh peralatan","Mengganti panel dengan lampu","Hanya menunggu cuaca cerah"]]]]],
+[["Pak Budi petani sayur menjual hasil panennya di pasar. Ketika hujan deras merusak sebagian kebun, sayurnya menjadi sedikit dan harga di pasar naik.",[["Apa kegiatan ekonomi yang dilakukan Pak Budi?",["Menjual sayur","Membuat jalan","Mengajar","Menjaga hutan"]],["Mengapa harga sayur naik?",["Persediaan sayur sedikit","Pembeli tidak ada","Pasar ditutup","Sayur dibuat dari plastik"]],["Jika panen melimpah dan permintaan tetap, harga biasanya...",["Turun","Naik terus","Tidak mungkin berubah","Menjadi nol selamanya"]]]],
+ ["Warga Desa Sumber Rejeki berbeda agama dan suku. Setiap bulan mereka bergotong royong membersihkan sungai bersama. Sejak kegiatan itu, perselisihan antarwarga berkurang dan sungai kembali jernih.",[["Nilai yang tampak dari kegiatan warga adalah...",["Gotong royong","Persaingan","Individualisme","Diskriminasi"]],["Kerja sama warga berbagai suku dan agama paling mencerminkan sila...",["Ke-3: Persatuan Indonesia","Ke-1: Ketuhanan Yang Maha Esa","Ke-4: Kerakyatan","Ke-5: Keadilan Sosial"]],["Agar kerukunan itu bertahan, langkah paling berkeadilan adalah...",["Dialog rutin yang melibatkan semua kelompok warga","Membatasi kegiatan kelompok kecil","Hanya melibatkan tokoh mayoritas","Menghapus semua kegiatan bersama"]]]],
+ ["Tahun ini inflasi sebuah kota mencapai 6%, sementara upah pekerja rata-rata naik 3%. Seorang ekonom menyebut daya beli masyarakat menurun, tetapi pemerintah daerah menyatakan ekonomi tetap tumbuh baik.",[["Apa yang dimaksud inflasi?",["Kenaikan harga barang secara umum dan terus-menerus","Penurunan harga barang","Kenaikan upah","Naiknya nilai tukar"]],["Mengapa daya beli menurun?",["Kenaikan harga (6%) lebih besar daripada kenaikan upah (3%)","Upah turun","Harga turun","Pajak dihapus"]],["Untuk menilai klaim pemerintah daerah secara kritis, data yang paling perlu dicek adalah...",["Pertumbuhan riil, tingkat pengangguran, dan pengeluaran rumah tangga","Jumlah baliho pemerintah","Jumlah penduduk tahun lalu saja","Pendapat satu pedagang"]]]]],
+[['Hello! My name is Budi. I am ten years old. I have a cat. Her name is Mimi. Mimi likes fish. Every morning, I give her food and water.',[['How old is Budi?',['Ten','Nine','Eleven','Twelve']],['What does Mimi like?',['Fish','Milk','Bones','Grass']],['What can we say about Budi?',['He takes care of his cat','He is afraid of cats','He does not like animals','He has a dog']]]],
+['Announcement: The school library will close early at 2 p.m. on Friday because of a teachers’ meeting. Students who want to borrow books must come before 1.30 p.m. The library will open as usual on Monday.',[['When will the library close on Friday?',['At 2 p.m.','At 1.30 p.m.','At 3 p.m.','On Monday']],['Why will the library close early?',['Because teachers have a meeting','Because it is a holiday','Because books are missing','Because it is Monday']],['A student arrives at 1.45 p.m. on Friday to borrow a book. What is the best conclusion?',['He is too late and should come on Monday','He can still borrow the book','The library is closed on Monday','He should come at 3 p.m.']]]],
+['A city plans to ban private cars in its centre on weekends. Supporters say the policy will reduce pollution and make streets safer for pedestrians. Critics argue that small shops may lose customers and that public transport is not yet reliable enough.',[['What is the main purpose of the policy?',['To reduce pollution and make streets safer','To help shops earn more','To sell more cars','To improve buses']],['What can be inferred about the critics?',['They worry about side effects of the policy','They fully support the ban','They are car sellers','They live outside the city']],['Which evidence would best help evaluate the critics’ claim about shops?',['Sales data from shops before and after similar bans','The number of cars in the city','A photo of the city centre','A speech by the mayor']]]]]];
+
+const B=s=>s.trim().split('\n');
+const BK={1:[B(`0|Huruf kapital dipakai pada awal...|kalimat|kata sambung|angka|tanda baca
+0|Sinonim kata ‘pandai’ adalah...|pintar|bodoh|malas|nakal
+1|Kalimat yang berisi gagasan utama paragraf disebut kalimat...|utama|penjelas|tanya|seru
+1|Antonim kata ‘terang’ adalah...|gelap|cerah|silau|jelas
+2|Budi membuang sampah di sungai, lalu sungai meluap saat hujan. Pesan yang tepat adalah...|Jangan membuang sampah sembarangan|Sungai harus dibuat lebih besar|Hujan selalu menyebabkan banjir|Budi suka bermain di sungai
+2|Ungkapan ‘panjang tangan’ berarti...|suka mencuri|tangannya panjang|suka membantu|suka menulis`),B(`0|Teks yang berisi langkah-langkah membuat sesuatu disebut teks...|prosedur|narasi|berita|puisi
+0|Unsur intrinsik cerpen yang menunjukkan tempat, waktu, dan suasana adalah...|latar|tema|amanat|alur
+1|Kata baku dari ‘analisa’ adalah...|analisis|analisa|anelisis|analisys
+1|Kalimat ‘Mari kita jaga kebersihan kelas!’ termasuk kalimat...|ajakan|berita|tanya|larangan
+2|Judul berita ‘Siswa Ini Ajaib, Lulus Tanpa Belajar!’ patut dicurigai karena...|berlebihan dan tanpa bukti|memakai huruf kapital|terlalu pendek|memakai tanda seru
+2|Dua teks melaporkan jumlah peserta lomba yang berbeda. Langkah paling tepat untuk menilai kredibilitasnya adalah...|memeriksa sumber dan tanggal masing-masing teks|memilih yang lebih panjang|memilih yang lebih populer|menjumlahkan angka keduanya`),B(`0|Teks yang meyakinkan pembaca dengan argumen dan data disebut teks...|argumentasi|deskripsi|prosedur|anekdot
+0|Bagian teks eksposisi yang memuat pendapat penulis di awal disebut...|tesis|argumentasi|penegasan ulang|orientasi
+1|Kata ‘mutakhir’ bermakna...|terbaru|terdahulu|terburuk|terbesar
+1|Kalimat efektif adalah kalimat yang...|jelas, hemat, dan tepat|panjang dan rumit|banyak memakai kata asing|berulang-ulang
+2|Penulis menulis ‘Semua remaja kecanduan gawai.’ Kelemahan pernyataan ini adalah...|generalisasi berlebihan tanpa data|terlalu singkat|memakai kata baku|tidak berpredikat
+2|Untuk memperkuat argumen dalam teks diskusi, penulis sebaiknya...|menyajikan dua sudut pandang disertai data|hanya menyajikan satu pihak|memakai kalimat emosional|menghindari data`)],
+2:[B(`0|Alat gerak pada manusia terdiri atas tulang dan...|otot|kulit|darah|rambut
+0|Sumber energi utama di bumi adalah...|Matahari|Bulan|angin|api
+1|Es mencair menjadi air termasuk perubahan...|wujud zat|rasa|bau|bunyi
+1|Hewan yang makanannya tumbuhan disebut...|herbivora|karnivora|omnivora|dekomposer
+2|Tanaman di ruang gelap tumbuh pucat dan lemah. Penyebab paling tepat adalah kekurangan...|cahaya matahari|angin|garam|suara
+2|Siswa menguji pengaruh air pada pertumbuhan kacang. Hal yang harus dibuat sama adalah...|jenis biji dan cahaya yang diterima|jumlah air yang diberikan|tinggi tanaman akhir|jumlah daun akhir`),B(`0|Satuan SI untuk massa adalah...|kilogram|gram|newton|liter
+0|Organ yang memompa darah ke seluruh tubuh adalah...|jantung|paru-paru|ginjal|lambung
+1|Benda menempuh 120 m dalam 20 s. Kecepatannya adalah...|6 m/s|5 m/s|2.400 m/s|100 m/s
+1|Perpindahan kalor tanpa zat perantara disebut...|radiasi|konduksi|konveksi|evaporasi
+2|Benda 2 kg diberi gaya 10 N pada bidang licin. Percepatannya adalah...|5 m/s²|20 m/s²|0,2 m/s²|12 m/s²
+2|Penebangan hutan memicu banjir. Penjelasan ilmiah yang paling tepat adalah...|akar pohon berkurang sehingga penyerapan air tanah menurun|pohon menghasilkan hujan deras|tanah menjadi lebih ringan|air laut naik karena pohon`),B(`0|Zat hijau daun yang menyerap cahaya disebut...|klorofil|stomata|xilem|kutikula
+0|Rumus kimia air adalah...|H₂O|CO₂|O₂|NaCl
+1|Jumlah mol 18 gram air (Mr = 18) adalah...|1 mol|18 mol|0,5 mol|2 mol
+1|Gerak lurus berubah beraturan memiliki...|percepatan tetap|kecepatan tetap|gaya nol|jarak tetap
+2|Pernyataan ‘suhu bumi naik hanya karena Matahari’ paling baik dikritisi dengan...|data kenaikan suhu yang sejalan dengan meningkatnya gas rumah kaca|menolak semua data|mengabaikan konsentrasi CO₂|melihat cuaca satu hari saja
+2|Kelajuan 72 km/jam sama dengan...|20 m/s|72 m/s|7,2 m/s|120 m/s`)],
+3:[B(`0|Hari Kemerdekaan Indonesia diperingati setiap tanggal...|17 Agustus|28 Oktober|10 November|1 Juni
+0|Lambang sila pertama Pancasila adalah...|bintang|rantai|pohon beringin|kepala banteng
+1|Orang yang membeli barang untuk dipakai disebut...|konsumen|produsen|distributor|pedagang besar
+1|Rumah adat Joglo berasal dari daerah...|Jawa|Papua|Sumatra Barat|Bali
+2|Desa A dan B berbeda adat tetapi saling membantu saat gotong royong. Sikap yang tampak adalah...|toleransi dan kerja sama|persaingan|egoisme|diskriminasi
+2|Harga cabai naik saat musim hujan. Penyebab yang paling mungkin adalah...|hasil panen berkurang|pembeli menurun|pasar tutup|cabai berubah warna`),B(`0|Garis khayal yang membagi bumi menjadi belahan utara dan selatan adalah...|khatulistiwa|meridian|garis tanggal|garis balik
+0|Organisasi pergerakan nasional pertama di Indonesia adalah...|Budi Utomo|Sarekat Islam|Indische Partij|PNI
+1|Penyebab perubahan iklim akibat aktivitas manusia adalah...|meningkatnya emisi gas rumah kaca|gerhana bulan|pasang surut|rotasi bumi
+1|Jalur rempah Nusantara terkenal karena perdagangan...|cengkih dan pala|garam|besi|batu bara
+2|Pasar tradisional kehilangan pembeli karena belanja daring. Langkah adaptasi yang paling tepat adalah...|menyediakan layanan pesan antar dan pembayaran digital|menolak teknologi|menaikkan harga|menutup pasar
+2|Wilayah pesisir sering banjir rob. Mitigasi yang paling berkelanjutan adalah...|menanam mangrove dan menata tata ruang|membuang sampah ke laut|menebang hutan bakau|membangun lebih dekat laut`),B(`0|Ilmu yang mempelajari masyarakat dan interaksi sosial adalah...|sosiologi|geografi|ekonomi|sejarah
+0|Kerajaan Hindu-Buddha tertua di Indonesia adalah...|Kutai|Majapahit|Sriwijaya|Mataram
+1|Sistem Informasi Geografis (SIG) digunakan untuk...|mengolah dan menganalisis data keruangan|menghitung pajak|mengukur suhu tubuh|menanam padi
+1|Jika harga naik dan hal lain tetap, jumlah barang yang diminta cenderung...|turun|naik|tetap|nol
+2|Seseorang menaruh seluruh tabungan pada satu investasi berisiko tinggi. Prinsip yang diabaikan adalah...|diversifikasi|konsumsi|distribusi|produksi
+2|Peneliti menemukan dua prasasti dengan informasi berbeda. Langkah awal paling tepat adalah...|kritik sumber untuk menilai keaslian dan kredibilitas|memilih salah satu|membuang keduanya|menunggu hingga lupa`)],
+4:[B(`0|What color is a banana?|Yellow|Blue|Black|Pink
+0|Choose the correct word: This is ___ apple.|an|a|am|is
+1|‘How are you?’ The best answer is...|I’m fine, thank you.|My name is Ali.|It is red.|Good night.
+1|What is the plural of ‘book’?|books|bookes|bookies|bookss
+2|Rani wakes up at 5. She takes a bath, eats breakfast, and goes to school. What does Rani do after taking a bath?|She eats breakfast|She goes to bed|She wakes up|She comes home
+2|Tom has 3 pencils. His sister gives him 4 more. How many pencils does Tom have now?|7|1|12|34`),B(`0|The opposite of ‘hot’ is...|cold|warm|big|tall
+0|She ___ to school every day.|goes|go|going|gone
+1|Yesterday, we ___ a football match.|watched|watch|watching|watches
+1|‘To make tea, first boil some water.’ This sentence belongs to a ___ text.|procedure|descriptive|narrative|news
+2|The red bag is cheaper, but the blue bag is stronger. Sam needs a bag for hiking. Which is the better choice?|The blue bag|The red bag|Neither|Both are the same
+2|Dina wrote, ‘Plastic bags should be banned because they harm sea animals.’ What is her opinion?|Plastic bags should not be used|Sea animals like plastic|Plastic is cheap|Bags are fashionable`),B(`0|The synonym of ‘significant’ is...|important|tiny|silent|easy
+0|If it rains tomorrow, we ___ the picnic.|will cancel|cancelled|would cancelled|cancel
+1|The word ‘however’ in a text shows...|contrast|addition|result|time
+1|Which sentence is in the passive voice?|The letter was sent yesterday.|She sent the letter.|He is writing a letter.|We will send a letter.
+2|‘Studies show that students who sleep eight hours score higher.’ The best way to check this claim is to...|read the original research and its sample size|ask one friend|trust it because it is online|ignore numbers
+2|The author argues that homework should be reduced but admits it builds discipline. This is mostly a ___ text.|discussion|recount|procedure|descriptive`)]};
+const BX={1:[`0|Kata yang diawali huruf vokal adalah...|api|buku|meja|lampu
+1|Kalimat tanya diakhiri dengan tanda...|tanda tanya|titik|seru|koma
+1|Ayah membaca koran di teras. Subjek kalimat itu adalah...|Ayah|koran|teras|membaca
+2|Seorang anak jujur mengembalikan dompet temuan. Sifat yang patut ditiru adalah...|jujur|boros|malas|pelit`,`0|Majas dalam ‘Ia bagai singa di medan laga’ adalah...|simile|metafora|hiperbola|ironi
+1|Kalimat yang memakai kata baku adalah...|Saya berangkat ke sekolah pagi ini.|Gue udah berangkat ke sekolah.|Aku mau cabut ke sekolah.|Gua jalan ke sekolah.
+1|Pernyataan yang bersifat fakta adalah...|Air membeku pada suhu 0°C.|Makanan itu pasti paling enak.|Hari ini sangat membosankan.|Lagu itu terlalu keras.
+2|Penulis berita memakai kata ‘diduga’ untuk menunjukkan bahwa...|informasi belum terbukti pasti|informasi pasti benar|penulis sedang marah|berita sudah selesai`,`0|Teks yang menceritakan kisah rekaan disebut...|cerita fiksi|laporan observasi|eksposisi|prosedur
+1|Kata hubung yang membentuk kalimat majemuk bertingkat adalah...|karena|dan|tetapi|atau
+1|Rumusan masalah dalam karya ilmiah biasanya berbentuk...|kalimat tanya|kalimat seru|puisi|dialog
+2|Dua artikel menyimpulkan hal bertentangan tentang manfaat suatu diet. Sikap kritis yang tepat adalah...|menelusuri metode, sampel, dan pendanaan penelitian|memilih artikel yang lebih menarik|memilih yang paling banyak dibagikan|tidak membaca keduanya`],
+2:[`0|Jumlah planet di tata surya adalah...|8|9|7|10
+1|Gaya yang membuat benda jatuh ke bumi adalah gaya...|gravitasi|magnet|gesek|pegas
+1|Bagian tumbuhan yang menyerap air dari tanah adalah...|akar|daun|bunga|batang
+2|Sampah plastik sulit terurai. Tindakan terbaik mengurangi dampaknya adalah...|memakai ulang dan mendaur ulang|membakar di halaman|membuang ke sungai|membuang sembarangan`,`0|Sel darah merah berfungsi mengangkut...|oksigen|antibodi|racun|hormon
+1|Benda bermassa 5 kg di tempat dengan g = 10 m/s² memiliki berat...|50 N|5 N|15 N|0,5 N
+1|Pemanasan global berkaitan erat dengan meningkatnya gas...|karbon dioksida|oksigen|nitrogen|argon
+2|Siswa membandingkan tiga jenis pupuk pada tanaman yang sama. Agar adil, siswa harus...|mengubah hanya jenis pupuk dan menjaga hal lain tetap|mengubah semua faktor sekaligus|memakai tiga jenis tanaman berbeda|memberi air berbeda pada tiap pot`,`0|Organel penghasil energi (ATP) pada sel adalah...|mitokondria|ribosom|lisosom|nukleus
+1|Persamaan 2H₂ + O₂ → 2H₂O menunjukkan berlakunya...|hukum kekekalan massa|perubahan fisika|reaksi tidak setara|pelarutan
+1|Energi alternatif dari cahaya matahari disebut energi...|surya|batu bara|minyak bumi|gas alam
+2|Grafik CO₂ naik tiap tahun, kecuali turun sementara pada satu tahun. Kesimpulan paling tepat adalah...|tren jangka panjang tetap naik meski ada fluktuasi|tren berhenti naik|datanya pasti salah|CO₂ tidak berpengaruh`],
+3:[`0|Mata uang yang digunakan di Indonesia adalah...|rupiah|dolar|yen|ringgit
+1|Sumber daya alam yang dapat diperbarui adalah...|hutan|minyak bumi|batu bara|gas alam
+1|Tokoh yang dijuluki Bapak Pendidikan Nasional adalah...|Ki Hajar Dewantara|R.A. Kartini|Diponegoro|Cut Nyak Dhien
+2|Warga membersihkan selokan bersama sebelum musim hujan. Manfaat utamanya adalah...|mencegah banjir dan mempererat kebersamaan|membuat hujan turun|menambah sampah|menghilangkan air hujan`,`0|Pancasila ditetapkan sebagai dasar negara pada...|18 Agustus 1945|1 Juni 1945|17 Agustus 1945|28 Oktober 1928
+1|Kegiatan menghasilkan barang atau jasa disebut...|produksi|konsumsi|distribusi|investasi
+1|Pada peta berskala 1:100.000, 1 cm di peta sama dengan...|1 km|100 m|10 km|100 km
+2|Dua kelompok pemuda berselisih karena salah paham di media sosial. Solusi berkeadilan yang tepat adalah...|mempertemukan keduanya untuk dialog dan klarifikasi|membiarkan hingga membesar|memihak salah satu|memblokir semua akun`,`0|Zaman ketika manusia mulai mengenal tulisan disebut zaman...|sejarah|prasejarah|batu tua|logam
+1|Masyarakat dengan banyak suku, agama, dan budaya disebut masyarakat...|multikultural|homogen|tertutup|agraris
+1|Lembaga yang mengawasi sektor jasa keuangan di Indonesia adalah...|OJK|BPS|KPK|MPR
+2|Seseorang tergiur investasi yang menjanjikan untung 50% per bulan tanpa risiko. Sikap paling bijak adalah...|memeriksa legalitas dan menilai kewajaran imbal hasil|menyetor seluruh tabungan|mengajak seluruh keluarga|percaya karena ada testimoni`],
+4:[`0|How many days are there in a week?|Seven|Five|Ten|Twelve
+1|My mother cooks in the ___.|kitchen|bathroom|library|garden
+1|Choose the correct sentence.|She is my sister.|She are my sister.|She am my sister.|She be my sister.
+2|Sam is hungry. He wants to eat. What should he do?|Eat some food|Go to sleep|Take a bath|Read a map`,`0|I ___ a student.|am|is|are|be
+1|The past tense of ‘go’ is...|went|goed|gone|going
+1|‘Where is the post office?’ asks about...|location|time|price|age
+2|‘The museum is open from 9 a.m. to 4 p.m.’ Anita arrives at 4.30 p.m. What is the best conclusion?|The museum is already closed|She can buy a ticket|The museum opens later|Tickets are free`,`0|The antonym of ‘increase’ is...|decrease|improve|expand|grow
+1|‘She suggested that we leave early.’ The word ‘suggested’ shows...|a recommendation|a prohibition|a complaint|a threat
+1|Choose the correct sentence.|If I were you, I would apologize.|If I was you, I will apologize.|If I am you, I would apologized.|If I be you, I apologize.
+2|A writer claims, ‘Everyone loves online learning.’ What is the weakness of this claim?|It generalizes without evidence|It is too short|It uses formal words|It has a title`]};
+for(const s in BX)BX[s].forEach((t,l)=>BK[s][l].push(...B(t)));
+const PR='Pemahaman IPA|Makhluk hidup, materi, energi, gaya, gelombang, listrik, bumi dan antariksa, iklim|Sistem organ;Materi dan perubahannya;Perubahan iklim;Gerak dan gaya;Kalor;Listrik dan magnet;Tata surya\nKeterampilan Proses|Mengamati, memprediksi, menyelidiki, menganalisis data, refleksi, komunikasi|Mengamati;Penyelidikan;Analisis data;Evaluasi dan refleksi';
+const CPL=(P=>[[P(`Bilangan|Bilangan sampai 1.000.000, operasi hitung, KPK-FPB, pecahan, desimal|Operasi hitung;KPK dan FPB;Pecahan dan desimal;Uang
+Aljabar|Nilai tak diketahui, pola bilangan, rasio dan proporsi|Pola bilangan;Rasio dan proporsi;Kalimat matematika
+Pengukuran|Keliling, luas, durasi waktu, besar sudut|Keliling dan luas;Waktu;Sudut
+Geometri|Bangun ruang, perbandingan bangun, peta berpetak|Bangun datar;Bangun ruang;Peta berpetak
+Analisis Data dan Peluang|Menyajikan dan menganalisis data, kejadian acak|Diagram batang;Tabel frekuensi;Peluang sederhana`),P(`Bilangan|Bilangan bulat, rasional, berpangkat, notasi ilmiah, rasio dan proporsi|Bilangan bulat dan rasional;Berpangkat dan notasi ilmiah;Rasio dan proporsi;Literasi finansial
+Aljabar|Pola, bentuk aljabar, relasi dan fungsi, persamaan linear, SPLDV|Bentuk aljabar;Persamaan linear;Relasi dan fungsi;SPLDV
+Pengukuran|Lingkaran, luas permukaan dan volume bangun ruang|Lingkaran;Luas permukaan;Volume
+Geometri|Hubungan sudut, kesebangunan, Pythagoras, transformasi|Hubungan sudut;Kesebangunan;Pythagoras;Transformasi
+Analisis Data dan Peluang|Data, diagram, mean-median-modus, peluang|Mean median modus;Diagram;Peluang`),P(`Bilangan|Bilangan berpangkat, barisan dan deret, bunga tunggal dan majemuk|Bilangan berpangkat;Barisan dan deret;Bunga majemuk
+Aljabar dan Fungsi|Pertidaksamaan, fungsi kuadrat, eksponensial, fungsi invers|Pertidaksamaan;Fungsi kuadrat;Fungsi eksponensial;Fungsi invers dan komposisi
+Geometri|Trigonometri dan unsur-unsur lingkaran|Trigonometri;Lingkaran
+Analisis Data dan Peluang|Box plot, diagram pencar, peluang, permutasi dan kombinasi|Statistika;Diagram pencar;Peluang;Permutasi dan kombinasi`)],
+[P(`Menyimak|Menganalisis informasi dan isi teks aural|Informasi teks lisan;Teks sastra lisan
+Membaca dan Memirsa|Membaca fasih, menganalisis informasi dan nilai teks|Ide pokok;Pesan dan nilai;Kosakata dan makna
+Berbicara dan Mempresentasikan|Mempresentasikan gagasan secara efektif dan santun|Presentasi;Bercerita
+Menulis|Menulis kalimat kompleks, makna denotatif dan konotatif|Kalimat;Ejaan;Makna kata;Karangan`),P(`Menyimak|Menganalisis gagasan, pandangan, pesan teks aural|Gagasan teks lisan;Unsur intrinsik sastra lisan
+Membaca dan Memirsa|Makna tersurat-tersirat, pro-kontra, kredibilitas teks|Makna tersurat dan tersirat;Pro dan kontra;Kredibilitas teks
+Berbicara dan Mempresentasikan|Menyajikan usul dan solusi secara kritis dan kreatif|Usul dan solusi;Teks multimodal
+Menulis|Menulis logis, kritis, kreatif; makna denotatif, konotatif, kiasan|Jenis teks;Ejaan dan kalimat;Makna kata`),P(`Menyimak|Mengevaluasi gagasan dan pesan teks aural, mengapresiasi sastra|Evaluasi teks lisan;Apresiasi sastra lisan
+Membaca dan Memirsa|Mengevaluasi kredibilitas teks, membandingkan isi teks|Evaluasi gagasan;Kredibilitas teks;Perbandingan teks
+Berbicara dan Mempresentasikan|Presentasi sistematis dan kritis, mempertahankan argumen|Presentasi;Argumentasi;Debat
+Menulis|Menulis logis, kritis, kreatif dan memublikasikan karya|Teks argumentasi dan eksposisi;Kalimat efektif;Kosakata;Publikasi karya`)],
+[P(`Wujud zat dan perubahannya|Sifat dan perubahan wujud benda (ringkasan IPAS)|Wujud zat;Perubahan wujud
+Makhluk hidup dan lingkungan|Ciri, kebutuhan, interaksi makhluk hidup|Tubuh manusia;Tumbuhan;Hewan;Lingkungan
+Gaya dan energi|Gaya, gerak, sumber energi|Gaya;Energi
+Bumi dan antariksa|Matahari, bumi, tata surya|Tata surya;Matahari`),P(PR),P(PR.replace('Makhluk hidup, materi, energi, gaya, gelombang, listrik, bumi dan antariksa, iklim|Sistem organ;Materi dan perubahannya;Perubahan iklim;Gerak dan gaya;Kalor;Listrik dan magnet;Tata surya','Ekosistem, gerak 2D, energi alternatif, stoikiometri, perubahan iklim|Ekosistem dan sel;Gerak;Energi alternatif;Stoikiometri;Perubahan iklim'))],
+[P(`Lingkungan dan geografi|Lingkungan sekitar, sumber daya alam, peta (ringkasan IPAS)|Peta;Sumber daya alam;Lingkungan sekitar
+Kegiatan ekonomi|Produksi, distribusi, konsumsi, harga|Produsen dan konsumen;Harga dan pasar
+Keberagaman dan sosial budaya|Suku, budaya, gotong royong, Pancasila|Budaya daerah;Gotong royong;Pancasila
+Sejarah|Peristiwa dan tokoh sejarah|Kemerdekaan;Tokoh nasional`),P(`Geografi|Keberagaman geografis, sumber daya alam, iklim, mitigasi bencana|Peta dan khatulistiwa;Perubahan iklim;Mitigasi bencana
+Ekonomi|Kegiatan ekonomi, harga, pasar|Produksi dan konsumsi;Pasar dan harga;Adaptasi ekonomi digital
+Sosiologi dan Kewargaan|Interaksi sosial, integrasi bangsa, Pancasila|Gotong royong;Pancasila;Penyelesaian konflik
+Sejarah|Konsep dasar sejarah, pergerakan nasional, jalur rempah|Pergerakan nasional;Jalur rempah;Dasar negara`),P(`Geografi|Geografi fisik, SIG, wilayah|Geografi fisik;Sistem Informasi Geografis;Mitigasi bencana
+Ekonomi|Hakikat ekonomi, produk keuangan, investasi|Permintaan dan penawaran;Inflasi;Produk keuangan dan investasi
+Sosiologi|Masyarakat multikultural dan interaksi sosial|Masyarakat multikultural;Interaksi sosial
+Sejarah|Penelitian sejarah, kerajaan Hindu-Buddha hingga Islam|Metode sejarah;Kerajaan Hindu-Buddha;Kerajaan Islam`)],
+[P(`Menyimak-Berbicara|Memahami dan merespons teks lisan sederhana sehari-hari|Greetings and introduction;Daily routines
+Membaca-Memirsa|Memahami teks pendek, ide utama, informasi rinci|Family and pets;Animals and food;Numbers and colors
+Menulis-Mempresentasikan|Mengomunikasikan ide dalam teks tulis sederhana|Simple sentences;Plural and articles`),P(`Menyimak-Berbicara|Memahami teks lisan dan mengungkapkan gagasan sederhana|Asking and giving information;Announcement
+Membaca-Memirsa|Informasi tersurat dan tersirat berbagai jenis teks|Descriptive text;Procedure text;Announcement;Implicit information
+Menulis-Mempresentasikan|Menulis dan mempertahankan pendapat dengan struktur tepat|Tenses;Recount;Opinion`),P(`Menyimak-Berbicara|Memahami teks lisan, menyampaikan dan mempertahankan argumen|Current issues;Expressing opinion
+Membaca-Memirsa|Menganalisis, menyimpulkan, mengevaluasi informasi teks|Narrative;Exposition;Discussion;Inference and evaluation
+Menulis-Mempresentasikan|Menulis teks fiksi dan nonfiksi dengan unsur kebahasaan tepat|Grammar;Conditional sentences;Vocabulary`)]])(s=>B(s).map(l=>{const p=l.split('|');return{n:p[0],d:p[1],t:p[2].split(';')}}));
+const CM={1:['1.1 3.1 1.2 1.0 1.2 1.1 1.2 3.1 3.1 3.0 1.1','1.0 3.0 1.0 3.1 3.1 1.2 1.2 3.2 3.1 1.1 1.2','1.0 3.0 3.0 3.2 3.1 1.0 2.1 3.0 3.1 3.0 1.1'],
+2:['0.1 1.0 2.1 0.1 1.2 1.1 1.1 3.0 2.0 1.1 1.3','1.2 0.3 0.0 0.3 0.4 0.3 0.2 0.0 0.3 0.2 1.1','0.2 0.0 0.3 0.3 0.1 0.4 0.1 0.0 0.3 0.2 1.2'],
+3:['1.1 3.0 2.2 1.0 2.0 2.1 1.1 1.0 0.1 3.1 2.1','2.0 0.0 3.0 0.1 3.1 1.2 0.2 3.2 1.0 0.0 2.2','1.1 2.1 3.1 0.1 1.0 1.2 3.0 3.0 2.0 1.2 1.2'],
+4:['1.0 1.2 2.1 0.0 2.1 0.1 1.2 1.2 1.0 2.0 1.1','1.2 1.0 2.0 2.0 1.1 1.3 2.2 2.0 2.0 0.0 1.3','1.3 2.2 2.1 2.0 2.0 1.3 1.2 2.2 2.0 2.1 1.3']};
+const MC=[['0.0','2.0','0.2'],['0.2','0.3','3.2'],['0.1','1.2','3.0']];
+function rc(){const l=CPL[su][lv];chips('cps',['Semua CP',...l.map(x=>x.n)],()=>cpi+1,i=>{cpi=i-1;TP=[]})}
+const rp=n=>n.toLocaleString('id-ID');
+function gm0(L,d){const a=2+R(8),b=2+R(8);
+ if(L==0){const p=500*(a+d*3),n=b+d*4,t=n*p,M=Math.ceil((t+1)/10000)*10000;
+  return{s:`Koperasi sekolah menjual buku tulis seharga Rp${rp(p)} per buku. Andi membeli ${n} buku dan membayar dengan uang Rp${rp(M)}. Ia ingin tahu apakah kembaliannya cukup untuk membeli buku lagi.`,q:[['Berapa total harga buku yang dibeli Andi?',t,'Rp'],['Berapa uang kembalian Andi?',M-t,'Rp'],['Berapa buku tambahan yang dapat dibeli dengan uang kembalian tersebut?',Math.floor((M-t)/p),'buku']]}}
+ if(L==1){const w=10*(1+R(3)+d),h=b+4,pc=10*(1+R(4));
+  return{s:`Kebun sekolah berbentuk persegi panjang berukuran ${w} m × ${h} m. Pak Guru berencana menanam sayur pada ${pc}% luas kebun dan memagari seluruh kebun. Pagar dijual Rp20.000 per meter.`,q:[['Berapa luas kebun?',w*h,'m²'],['Berapa luas lahan yang ditanami sayur?',pc*w*h/100,'m²'],['Berapa biaya pagar yang dibutuhkan?',2*(w+h)*20000,'Rp']]}}
+ const n=[5,8,10][d],A=8+a,B=2+R(4),S=n*(2*A+(n-1)*B)/2;
+ return{s:`Sebuah aula membuat tribun: baris pertama berisi ${A} kursi dan setiap baris berikutnya bertambah ${B} kursi. Tribun memiliki ${n} baris. Tiket dijual Rp5.000 per kursi untuk satu pertunjukan.`,q:[[`Berapa kursi pada baris ke-${n}?`,A+(n-1)*B,'kursi'],['Berapa total kursi di tribun?',S,'kursi'],['Berapa pendapatan jika seluruh kursi terjual?',S*5000,'Rp']]}}
+const G1=[d=>{const p=10*(2+R(5)+d),l=5*(2+R(3)),k=2+R(3)+d;return{s:`Lapangan sekolah berbentuk persegi panjang dengan panjang ${p} m dan lebar ${l} m. Pak Ali berlari mengelilingi lapangan sebanyak ${k} kali setiap pagi.`,q:[['Berapa keliling lapangan?',2*(p+l),'m'],['Berapa luas lapangan?',p*l,'m²'],['Berapa jarak total yang ditempuh Pak Ali?',k*2*(p+l),'m']]}},
+ d=>{const p=10000*(5+R(10)+d*5),dp=[10,20,25][R(3)],k=2+R(3),h=p*dp/100;return{s:`Toko menjual jaket seharga Rp${rp(p)} dengan diskon ${dp}%. Rina membeli ${k} jaket.`,q:[['Berapa potongan harga per jaket?',h,'Rp'],['Berapa harga satu jaket setelah diskon?',p-h,'Rp'],['Berapa total yang dibayar Rina?',k*(p-h),'Rp']]}},
+ d=>{const a=100*(1+R(5)),n=[3,4,5][d];return{s:`Sebuah koloni bakteri berjumlah ${a} sel dan membelah menjadi dua kali lipat setiap jam. Peneliti mengamatinya selama ${n} jam.`,q:[[`Berapa jumlah sel setelah ${n} jam?`,a*2**n,'sel'],[`Berapa jumlah sel setelah ${n-1} jam?`,a*2**(n-1),'sel'],[`Berapa kali lipat jumlah awal setelah ${n} jam?`,2**n,'kali']]}}];
+const G2=[d=>{const M=40000*(1+R(3)+d);return{s:`Dina memiliki uang Rp${rp(M)}. Seperempat bagian ia gunakan untuk membeli buku dan setengah bagian ia tabung.`,q:[['Berapa uang yang dipakai membeli buku?',M/4,'Rp'],['Berapa uang yang ditabung?',M/2,'Rp'],['Berapa sisa uang Dina?',M/4,'Rp']]}},
+ d=>{const s=1+R(4)+d;return{s:`Sebuah tangga bersandar pada dinding. Kaki tangga berjarak ${3*s} m dari dinding dan ujung atas tangga mencapai ketinggian ${4*s} m.`,q:[['Berapa panjang tangga?',5*s,'m'],['Berapa keliling segitiga yang dibentuk tangga, dinding, dan lantai?',12*s,'m'],['Berapa luas segitiga tersebut?',6*s*s,'m²']]}},
+ d=>{const m=60+R(20),k=2+R(4)+d;return{s:`Lima siswa mengikuti tes dengan nilai ${m-2*k}, ${m-k}, ${m}, ${m+k}, dan ${m+2*k}.`,q:[['Berapa rata-rata nilai?',m,''],['Berapa jumlah seluruh nilai?',5*m,''],['Berapa jangkauan (range) nilai?',4*k,'']]}}];
+function gm(L,d){const r=R(3),m=r?(r==1?G1:G2)[L](d):gm0(L,d);m.c=MC[L][r];return m}
+const fm=(v,u)=>u=='Rp'?'Rp'+rp(v):rp(v)+(u?' '+u:'');
+function mkq(q,v,u){const s=new Set([v]),st=Math.max(1,Math.round(v/8));while(s.size<4){const x=v+(R(2)?1:-1)*(1+R(4))*st;if(x>=0)s.add(x)}return[q,[fm(v,u),...[...s].filter(x=>x!==v).map(x=>fm(x,u))]]}
+function qset(N){const T=['Mengingat &amp; menemukan informasi','Inferensi &amp; penalaran','Berpikir kritis'],man=MAN.filter(m=>m.su==su&&m.lv==lv&&(!TP.length||TP.includes(m.tp))).map(m=>({s:m.s,q:[m.q,m.o],tag:'Soal manual · '+m.tp}));let base=[];const ws=new Set(),wc=(cpi>=0||TP.length)?0:-1;TP.forEach(z=>CPL[su][lv].forEach((x,k)=>{const j=x.t.indexOf(z);if(j>=0&&(cpi<0||cpi==k))ws.add(k+'.'+j)}));const ml=c=>{if(!c)return 2;if(ws.size)return ws.has(c)?2:(cpi>=0&&c.split('.')[0]==cpi?1:0);return cpi<0||c.split('.')[0]==cpi?2:0};
+ if(TP.length&&man.length)base=shuf(man);
+ else if(su==0)for(let k=0;k<Math.ceil(N/3);k++){if(!k)BQ().forEach(x=>base.push(x));let m,b2=null,t=0;while(t++<40){m=gm(lv,df);m.l=ml(m.c);if(!b2||m.l>b2.l)b2=m;if(m.l==2)break}m=b2;m.q.forEach((a,j)=>base.push({s:m.s,q:mkq(...a),tag:T[j],c:m.c}))}
+ else{const b=Q[su][lv],TG=['Literasi dasar','Pemahaman & penerapan','Berpikir kritis'],cm=CM[su][lv].split(' ');b[1].forEach((q,j)=>base.push({s:b[0],q:q,tag:T[j],d:j,c:cm[0]}));BK[su][lv].forEach((z,i)=>{const p=z.split('|');base.push({s:'',q:[p[1],p.slice(2)],tag:TG[+p[0]],d:+p[0],c:cm[i+1]})});BQ().forEach(x=>base.push(x));const mx=Math.max(...base.map(x=>ml(x.c)));base=base.filter(x=>ml(x.c)==mx);if(wc>=0&&mx<2)NOQ=1;base=base.concat(shuf(man)).map(x=>[Math.abs((x.d==null?df:x.d)-df)+Math.random()*.9,x]).sort((a,c)=>a[0]-c[0]).map(x=>x[1])}
+ if(su==0){const mx=Math.max(...base.map(x=>ml(x.c)));base=shuf(base.filter(x=>ml(x.c)==mx));if(wc>=0&&mx<2)NOQ=1}
+ const out=base.slice();while(out.length<N)out.push(...shuf(base));return out.slice(0,N)}
+
+let lv=1,su=0,df=1,ti=0,tp='',TP=[],NQ=5,cpi=-1,NOQ=0;
+function chips(id,items,cur,cb){const el=$(id),r=()=>{el.innerHTML='';items.forEach((t,i)=>{const b=document.createElement('button');b.className='chip'+(i==cur()?' on':'');b.innerHTML=t;b.onclick=()=>{cb(i);r();upd()};el.appendChild(b)})};r()}
+function upd(){rc();rt();const c=cpi<0?[CPL[su][lv].map(x=>x.n+': '+x.d).join(' • '),CPL[su][lv].flatMap(x=>x.t).join(' · ')]:[CPL[su][lv][cpi].d,CPL[su][lv][cpi].t.join(' · ')];$('cp').innerHTML=`<h3>${SUB[su].e} ${SUB[su].n} · ${LVN[lv]}</h3><p>${c[0]}</p>${TP.length?'<p class="hint">Topik terpilih: '+TP.join(', ')+'. Soal dalam misi difokuskan pada topik-topik ini.</p>':''}<div class="tp">${c[1].split(' · ').map(t=>`<span>${t}</span>`).join('')}</div>`}
+const NQS=[3,5,10,15,20];let MAN=[];try{MAN=JSON.parse(localStorage.getItem('pb3d')||'[]')}catch(e){}
+const dec=s=>s.replace(/&amp;/g,'&'),sv=()=>{try{localStorage.setItem('pb3d',JSON.stringify(MAN))}catch(e){}};
+function tops(){const b=(cpi<0?CPL[su][lv].flatMap(c=>c.t):CPL[su][lv][cpi].t).slice();MAN.forEach(m=>{if(m.su==su&&m.lv==lv&&!b.includes(m.tp))b.push(m.tp)});return b}
+function rt(){const t=tops();TP=TP.filter(x=>t.includes(x));const el=$('tps');el.innerHTML='';['Semua topik',...t].forEach((x,i)=>{const b=document.createElement('button');b.className='chip'+((i?TP.includes(x):!TP.length)?' on':'');b.textContent=x;b.onclick=()=>{if(!i)TP=[];else if(TP.includes(x))TP=TP.filter(y=>y!=x);else TP.push(x);upd()};el.appendChild(b)});$('tl').innerHTML=t.map(x=>'<option value=\''+x+'\'>').join('');
+ $('ml').innerHTML='';MAN.filter(m=>m.su==su&&m.lv==lv).forEach(m=>{const d=document.createElement('div');d.className='mi';d.textContent=m.tp+' — '+m.q+' ';const x=document.createElement('button');x.textContent='🗑';x.onclick=()=>{MAN.splice(MAN.indexOf(m),1);sv();upd()};d.appendChild(x);$('ml').appendChild(d)})}
+function addM(){const g=i=>$(i).value.replace(/[<>]/g,'').trim(),o=[0,1,2,3].map(i=>g('m'+i)),t=g('mt'),q=g('mq');
+ if(!t||!q||o.some(x=>!x)||new Set(o).size<4){alert('Isi topik, pertanyaan, dan 4 pilihan yang berbeda (pilihan A = jawaban benar).');return}
+ MAN.push({su,lv,tp:t,s:g('ms'),q,o});sv();if(!TP.includes(t))TP.push(t);['ms','mq','m0','m1','m2','m3'].forEach(i=>$(i).value='');upd()}
+chips('lvs',LVN,()=>lv,i=>{lv=i;TP=[];cpi=-1});chips('subs',SUB.map(s=>s.e+' '+s.n),()=>su,i=>{su=i;TP=[];cpi=-1});chips('dfs',DFN,()=>df,i=>df=i);chips('nqs',NQS.map(n=>n+' soal'),()=>NQS.indexOf(NQ),i=>NQ=NQS[i]);chips('ths',TH.map(t=>t.e+' '+t.n),()=>ti,i=>ti=i);upd();
+const show=id=>{['home','game'].forEach(s=>$(s).classList.toggle('on',s==id));$('hb').style.display=id=='home'?'block':'none';$('rs').classList.remove('on');$('qm').classList.remove('on')};
+
+// ===== 3D =====
+let L=2800;const U=40,GY=360,hit=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
+let Rr,S,C,DL,P,PL,th,plats,blocks,coins,ens,K={},score,lives,inv,paused=1,over=1,fr=0,toast=0,JV,qd,tmr,camX=0,flag;
+const X=x=>x/U,Y=y=>(GY-y)/U;
+const GCY=new THREE.CylinderGeometry(1,1,1,16),GCO=new THREE.ConeGeometry(1,1,14),GSP=new THREE.SphereGeometry(1,20,14),GBX=new THREE.BoxGeometry(1,1,1),GDO=new THREE.DodecahedronGeometry(1);
+const Mt=(c,o)=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.7},o||{}));
+function tex(f){const c=document.createElement('canvas');c.width=c.height=128;f(c.getContext('2d'));const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;return t}
+const qTex=(t,bg)=>tex(x=>{x.fillStyle=bg;x.fillRect(0,0,128,128);x.strokeStyle='#7a4b00';x.lineWidth=10;x.strokeRect(5,5,118,118);x.fillStyle='#fff8dc';x.font='bold 90px sans-serif';x.textAlign='center';x.fillText(t,64,98)});
+function add(g,m,x,y,z,sx,sy,sz,p){const o=new THREE.Mesh(g,m);o.position.set(x,y,z);o.scale.set(sx==null?1:sx,sy==null?1:sy,sz==null?1:sz);o.castShadow=o.receiveShadow=true;(p||S).add(o);return o}
+function mkPlayer(){const k=th.k,ast=k=='space'||k=='moon',O={forest:['#ff6d00','#1a237e','#4e342e',0,0],city:['#1565c0','#212121','#fafafa',1,0],beach:['#ff1744','#00e5ff','#6d4c41',0,1],sea:['#ff6d00','#ff6d00','#ffeb3b',1,0],sky:['#d50000','#212121','#3e2723',1,0],space:['#ffffff','#f5f5f5','#ff6d00',1,0],moon:['#ffffff','#f5f5f5','#ff6d00',1,0]}[k],g=new THREE.Group(),sk=Mt('#f2b58a',.5),sh=Mt(O[0],.6),pn=Mt(O[1],.6),hr=Mt('#111111',.8),bk=Mt(O[2],.7),fm=O[3]?sh:sk,lg=O[4]?sk:pn;
+ const leg=x=>{const hip=new THREE.Group();hip.position.set(x,.98,0);g.add(hip);add(GCY,pn,0,-.24,0,.115,.48,.115,hip);add(GSP,pn,0,0,0,.115,.115,.115,hip);
+  const kn=new THREE.Group();kn.position.y=-.48;hip.add(kn);add(GCY,lg,0,-.24,0,.095,.48,.095,kn);add(GSP,lg,0,0,0,.095,.095,.095,kn);add(GBX,bk,0,-.5,k=='sea'?.2:.07,k=='sea'?.22:.17,k=='sea'?.06:.1,k=='sea'?.7:.34,kn);return{hip,kn}};
+ const arm=x=>{const sd=new THREE.Group();sd.position.set(x,1.52,0);g.add(sd);add(GCY,sh,0,-.17,0,.075,.34,.075,sd);add(GSP,sh,0,0,0,.085,.085,.085,sd);
+  const el=new THREE.Group();el.position.y=-.34;sd.add(el);add(GCY,fm,0,-.16,0,.062,.32,.062,el);add(GSP,fm,0,0,0,.062,.062,.062,el);add(GSP,k=='sea'?Mt('#111'):fm,0,-.34,0,.075,.075,.075,el);return{sd,el}};
+ const ad=(...q)=>add(...q,g),a=leg(-.13),b=leg(.13),c=arm(-.36),d=arm(.36);
+ ad(GCY,sh,0,1.27,0,.27,.66,.17);ad(GCY,pn,0,.99,0,.25,.1,.17);ad(GSP,sh,0,1.57,0,.3,.1,.19);
+ ad(GCY,sk,0,1.67,0,.07,.1,.07);ad(GSP,sk,0,1.84,0,.2,.24,.2);ad(GSP,hr,0,1.91,-.03,.215,.2,.22);
+ ad(GSP,sk,-.2,1.84,0,.035,.05,.035);ad(GSP,sk,.2,1.84,0,.035,.05,.035);
+ ad(GSP,hr,-.075,1.86,.19,.03,.03,.02);ad(GSP,hr,.075,1.86,.19,.03,.03,.02);ad(GSP,sk,0,1.8,.2,.03,.04,.03);ad(GBX,Mt('#b33'),0,1.74,.19,.07,.015,.02);
+ ad(GBX,Mt(ast?'#d0d4da':({forest:'#d50000',city:'#ffd600',beach:'#ffeb3b',sea:'#eceff1',sky:'#ff6d00'})[k]||'#b71c1c'),0,1.3,-.2,ast?.42:.34,ast?.6:.46,ast?.2:.12);{const CH=({space:[.2,.16],moon:[.2,.16],sea:[.34,.06],sky:[.04,.34]})[k]||[.14,.14],CC=({forest:'#ffd600',city:'#ffffff',beach:'#ffffff',sea:'#ffffff',sky:'#ffd600'})[k]||'#ff6d00';ad(GBX,Mt(CC),0,1.5,.17,CH[0],CH[1],.02)}if(ast){ad(GSP,Mt('#bfe9ff',{transparent:true,opacity:.3,roughness:.05,metalness:.3}),0,1.86,0,.34,.36,.34);ad(GCY,Mt('#c8ccd2'),0,1.67,0,.2,.07,.2)}
+ if(k=='forest'){ad(GCY,Mt('#ffd600'),0,2.02,0,.42,.04,.42);ad(GCY,Mt('#ffd600'),0,2.12,0,.24,.2,.24);ad(GCY,Mt('#c62828'),0,2.06,0,.245,.04,.245)}
+ if(k=='city'){ad(GCY,Mt('#ffd600'),0,2.05,0,.25,.12,.25);ad(GBX,Mt('#ffd600'),0,2.0,.22,.28,.03,.2)}
+ if(k=='beach'){ad(GCY,Mt('#ffeb3b'),0,2.03,0,.46,.03,.46);ad(GCY,Mt('#ffeb3b'),0,2.1,0,.25,.14,.25);ad(GBX,Mt('#111'),0,1.87,.21,.4,.07,.03)}
+ if(k=='sea'){ad(GBX,Mt('#111'),0,1.87,.2,.44,.16,.05);ad(GBX,Mt('#8fe3ff',{transparent:true,opacity:.6,metalness:.4,roughness:.1}),0,1.87,.23,.38,.11,.03);ad(GCY,Mt('#111'),0,1.9,0,.215,.07,.215);ad(GCY,Mt('#ffc400'),.26,1.98,.08,.025,.5,.025);ad(GCY,Mt('#aeb7c0',{metalness:.6}),-.1,1.3,-.34,.1,.62,.1);ad(GCY,Mt('#aeb7c0',{metalness:.6}),.1,1.3,-.34,.1,.62,.1);ad(GSP,Mt('#ffc400'),0,1.65,-.34,.12,.08,.1)}
+ if(k=='sky'){ad(GSP,Mt('#212121'),0,1.95,-.02,.225,.2,.23);ad(GBX,Mt('#111'),0,1.98,.2,.4,.08,.04);ad(GSP,Mt('#8fe3ff',{metalness:.5,roughness:.1}),-.09,1.98,.22,.07,.07,.03);ad(GSP,Mt('#8fe3ff',{metalness:.5,roughness:.1}),.09,1.98,.22,.07,.07,.03)}
+ g.scale.setScalar(.6);return{g,lL:a.hip,lR:b.hip,kL:a.kn,kR:b.kn,aL:c.sd,aR:d.sd,eL:c.el,eR:d.el}}
+function mkOld(){const g=new THREE.Group(),sk=Mt('#e8b890',.6),nv=Mt('#1e3a8a',.5),dk=Mt('#17171f',.8),pv=g;
+ const limb=(x,y,w,h,m)=>{const p=new THREE.Group();p.position.set(x,y,0);g.add(p);add(GBX,m,0,-h/2,0,w,h,w,p);return p};
+ const lL=limb(-.16,.85,.24,.85,dk),lR=limb(.16,.85,.24,.85,dk),aL=limb(-.42,1.5,.2,.7,nv),aR=limb(.42,1.5,.2,.7,nv);
+ add(GCY,nv,0,1.15,0,.34,.72,.24);add(GBX,Mt('#fff'),0,1.3,.2,.14,.5,.04);add(GBX,Mt('#b71c1c'),0,1.2,-.28,.4,.55,.16);
+ add(GSP,sk,0,1.75,0,.27,.3,.27);add(GSP,dk,0,1.85,-.03,.29,.26,.29);
+ add(GSP,dk,-.09,1.74,.24,.04,.04,.04);add(GSP,dk,.09,1.74,.24,.04,.04,.04);
+ add(GBX,dk,0,2.07,0,.62,.06,.62);add(GCY,dk,0,2.0,0,.28,.1,.28);
+ g.scale.setScalar(.5);return{g,lL,lR,aL,aR}}
+function mkEnemy(c){if(th.k=='sea')return mkCrab();const g=new THREE.Group();add(GSP,Mt(c,{roughness:.4}),0,.5,0,.5,.45,.5,g);
+ [-.18,.18].forEach(x=>{add(GSP,Mt('#fff'),x,.62,.4,.13,.13,.1,g);add(GSP,Mt('#111'),x,.62,.5,.06,.06,.05,g)});
+ [-.22,.22].forEach(x=>add(GSP,Mt('#222'),x,.08,.1,.18,.1,.25,g));g.scale.setScalar(.8);return g}
+let SKY=[],SW=[],PA=[];
+const PHY={space:{ap:190,tm:2.6,ih:.93,bo:.55,cd:26,sp:1.5},moon:{ap:175,tm:3.2,ih:.9,sp:1.7},sea:{ap:150,tm:1.8,ih:.94,bo:.6,cd:20,sp:1.4}};
+function puff(p){const sea=th.k=='sea';for(let i=0;i<5;i++){const m=new THREE.Mesh(GSP,new THREE.MeshBasicMaterial({color:sea?'#e6fbff':'#ffd9a0',transparent:true,opacity:.7,fog:false}));m.scale.setScalar(.06+Math.random()*.08);m.position.set(X(p.x+p.w/2)+(Math.random()-.5)*.4,Y(p.y+p.h)+.1,.1);S.add(m);PA.push({m,vy:sea?.03+Math.random()*.03:-.02-Math.random()*.02,t:40})}}
+function dadd(g,m,x,y,z,sx,sy,sz,p){const o=add(g,m,x,y,z,sx,sy,sz,p);o.castShadow=o.receiveShadow=false;return o}
+function ptex(t){return tex(x=>{const n=(a,b)=>a+Math.random()*(b-a);
+ if(t=='gas'){const c=['#e8c9a0','#c9945f','#f1dfc0','#b87d4b','#d9b080'];for(let y=0;y<128;y+=8){x.fillStyle=c[R(5)];x.fillRect(0,y,128,9)}x.fillStyle='rgba(180,70,40,.6)';x.beginPath();x.ellipse(40,70,14,7,0,0,7);x.fill()}
+ else if(t=='earth'){x.fillStyle='#1e5fb4';x.fillRect(0,0,128,128);x.fillStyle='#3d9a4a';for(let i=0;i<9;i++){x.beginPath();x.ellipse(n(0,128),n(15,113),n(8,24),n(6,16),n(0,3),0,7);x.fill()}x.fillStyle='rgba(255,255,255,.55)';for(let i=0;i<14;i++){x.beginPath();x.ellipse(n(0,128),n(0,128),n(8,22),n(2,5),0,0,7);x.fill()}x.fillStyle='#fff';x.fillRect(0,0,128,7);x.fillRect(0,121,128,7)}
+ else if(t=='red'){x.fillStyle='#b5532f';x.fillRect(0,0,128,128);for(let i=0;i<60;i++){x.fillStyle='rgba('+(R(2)?'90,30,10':'230,150,100')+','+n(.1,.3)+')';x.beginPath();x.arc(n(0,128),n(0,128),n(2,12),0,7);x.fill()}}
+ else{x.fillStyle='#9fd8ee';x.fillRect(0,0,128,128);for(let y=0;y<128;y+=10){x.fillStyle='rgba(255,255,255,'+n(.1,.35)+')';x.fillRect(0,y,128,n(2,7))}}})}
+function decor(){let sd=11;const r=()=>(sd=sd*16807%2147483647)/2147483647,q=(a,b)=>a+r()*(b-a),k=th.k,X0=-14,W=L/U,X1=W+30,len=X1-X0;SKY=[];SW=[];PA=[];
+ const row=(n,fn)=>{for(let i=0;i<n;i++)fn(X0+(i+r())*len/n,i)},
+ sk=(m,f,rel,y,z,rot,c0)=>{c0=c0==null?q(8,Math.max(10,W-4)):c0;m.position.set(0,y,z);S.add(m);SKY.push({m,f,ox:c0*(1-f)+rel,r:rot||0})},
+ bob=(m,a,pu)=>SW.push({m,t:'j',y0:m.position.y,a,ph:q(0,6.28),pu,sy:m.scale.y}),
+ sun=(c,y)=>{const g=new THREE.Group();[[1,1],[1.8,.22],[2.8,.1]].forEach(([s,o])=>{const m=new THREE.Mesh(GSP,new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:o,depthWrite:false,fog:false}));m.scale.setScalar(5*s);g.add(m)});g.position.set(0,y,-95);S.add(g);SKY.push({m:g,f:.97,ox:12,r:0})},
+ pl=(t,s,ring,f,rel,y,z,c0)=>{const g=new THREE.Group(),m=new THREE.Mesh(new THREE.SphereGeometry(1,40,28),new THREE.MeshStandardMaterial({map:ptex(t),roughness:.9,emissive:'#223344',emissiveIntensity:.35}));g.add(m);
+  if(t=='earth'){const a=new THREE.Mesh(new THREE.SphereGeometry(1.08,32,20),new THREE.MeshBasicMaterial({color:'#6ab7ff',transparent:true,opacity:.18,side:THREE.BackSide,fog:false,depthWrite:false}));g.add(a)}
+  if(ring){const rg=new THREE.Mesh(new THREE.RingGeometry(1.35,2.3,72),new THREE.MeshStandardMaterial({color:'#d9c7a0',side:THREE.DoubleSide,transparent:true,opacity:.75,roughness:.8}));rg.rotation.x=Math.PI/2-.35;g.add(rg)}
+  g.scale.setScalar(s);sk(g,f,rel,y,z,.0015,c0)};
+ if(k=='forest'){sun('#fff2b0',26);
+  const fp=new THREE.Mesh(new THREE.PlaneGeometry(700,130),Mt(th.g,{roughness:1}));fp.rotation.x=-Math.PI/2;fp.position.set(W/2,-.1,-105);S.add(fp);
+  row(10,x=>{const h=q(10,20),w=q(9,16),z=-q(75,100);dadd(GCO,Mt('#6f93a8',{roughness:1}),x,h/2-1,z,w,h,w);dadd(GCO,Mt('#f4f8ff',{roughness:.8}),x,h*.86-1,z,w*.3,h*.28,w*.3)});
+  row(8,x=>{const h=q(6,11),w=q(8,13),z=-q(50,68);dadd(GCO,Mt('#5f8a5a',{roughness:1}),x,h/2-1,z,w,h,w)});
+  const gr=[Mt('#2e7d32'),Mt('#3a8f3d'),Mt('#256b2a'),Mt('#4a9d3f')],tr=Mt('#6b4226');
+  row(80,x=>{const z=-q(7,36),h=q(2.5,6.5),s=q(.8,1.2);dadd(GCY,tr,x,h*.15,z,.22*s,h*.3,.22*s);const m=gr[R(4)];for(let j=0;j<3;j++)dadd(GCO,m,x,h*.3+j*h*.2,z,(1.5-j*.35)*s*h/4.5,h*.34,(1.5-j*.35)*s*h/4.5)});
+  row(26,x=>dadd(GSP,gr[R(4)],x,.3,-q(5,12),q(.5,1),q(.4,.7),q(.5,1)));
+  row(24,x=>dadd(GDO,Mt('#8d8d86',{roughness:1}),x,.2,-q(5,14),q(.3,.8),q(.25,.5),q(.3,.7)))}
+ else if(k=='city'){sun('#ffd9a0',20);
+  const fp=new THREE.Mesh(new THREE.PlaneGeometry(700,130),Mt('#3d4148',{roughness:1}));fp.rotation.x=-Math.PI/2;fp.position.set(W/2,-.1,-105);S.add(fp);
+  const wt=[0,1,2,3].map(i=>tex(c=>{c.fillStyle=['#2b3a55','#3c4a63','#4a4f5c','#2f4a52'][i];c.fillRect(0,0,128,128);for(let a=0;a<8;a++)for(let b=0;b<8;b++){c.fillStyle=Math.random()>.45?'#ffe29a':'#1c2638';c.fillRect(a*16+3,b*16+3,10,11)}}));
+  const bl=(x,z,w,h)=>{const t=wt[R(4)].clone();t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(Math.max(1,Math.round(w*.9)),Math.max(1,Math.round(h/2.4)));t.needsUpdate=true;
+   dadd(GBX,Mt('#fff',{map:t,emissiveMap:t,emissive:'#ffffff',emissiveIntensity:.3,roughness:.5}),x,h/2,z,w,h,w);dadd(GBX,Mt('#222833'),x,h+.12,z,w*1.04,.25,w*1.04);
+   if(h>12&&R(2)){dadd(GCY,Mt('#999'),x,h+1.4,z,.05,2.6,.05);dadd(GSP,Mt('#ff1744',{emissive:'#ff1744',emissiveIntensity:1.5}),x,h+2.7,z,.12,.12,.12)}};
+  row(30,x=>bl(x,-q(46,72),q(3,6),q(16,34)));row(46,x=>bl(x,-q(11,40),q(2,4.5),q(5,18)));
+  const lp=Mt('#2e3440'),lh=Mt('#fff1b8',{emissive:'#ffd479',emissiveIntensity:1.6});
+  row(22,x=>{dadd(GCY,lp,x,1.6,-3.4,.06,3.2,.06);dadd(GSP,lh,x,3.3,-3.4,.2,.14,.2)})}
+ else if(k=='beach'){sun('#fff7c2',22);
+  dadd(GBX,Mt('#bdf0ff',{transparent:true,opacity:.55,roughness:.2}),W/2,-.15,-48.5,W+60,.05,5);
+  const tk=Mt('#8d6e4a'),fr=[Mt('#2e9d4a'),Mt('#37b25a'),Mt('#2a8a40')],cn=Mt('#4e342e');
+  row(34,x=>{const z=-q(4.5,16),h=q(4,6.5),ln=q(-.2,.2),g=new THREE.Group();g.position.set(x,0,z);S.add(g);
+   dadd(GCY,tk,ln*h/2,h/2,0,.17,h,.17,g).rotation.z=-ln;
+   for(let j=0;j<7;j++){const f=new THREE.Group();f.position.set(ln*h,h,0);f.rotation.y=j*.898;g.add(f);dadd(GCO,fr[R(3)],.9,-.3,0,.24,1.9,.09,f).rotation.z=-1.9}
+   dadd(GSP,cn,ln*h,h-.2,.2,.12,.12,.12,g);dadd(GSP,cn,ln*h+.15,h-.25,-.1,.11,.11,.11,g)});
+  const uc=['#ff1744','#ffeb3b','#00b0ff','#ff9100'];
+  row(12,x=>{const z=-q(3.5,7);dadd(GCY,Mt('#eee'),x,1.1,z,.04,2.2,.04);dadd(GCO,Mt(uc[R(4)]),x,2.35,z,1.3,.6,1.3)});
+  row(8,x=>{const z=-q(70,110),g=new THREE.Group();g.position.set(x,0,z);S.add(g);dadd(GBX,Mt('#fafafa'),0,.1,0,1.8,.35,.6,g);dadd(GCY,Mt('#777'),0,1.4,0,.04,2.6,.04,g);dadd(GCO,Mt('#ffffff'),.05,1.6,0,.8,2.6,.05,g);g.scale.setScalar(q(1,1.8));bob(g,.12)});
+  dadd(GCO,Mt('#2f8f46',{roughness:1}),W*.6,3.5,-125,16,8,12);dadd(GCO,Mt('#2f8f46',{roughness:1}),W*.25,2.6,-135,12,6,9);
+  const o=new THREE.Mesh(new THREE.PlaneGeometry(400,200),Mt('#1e88c9',{roughness:.2,metalness:.3}));o.rotation.x=-Math.PI/2;o.position.set(L/80,-.3,-120);S.add(o)}
+ else if(k=='sea'){
+  const fp=new THREE.Mesh(new THREE.PlaneGeometry(700,130),Mt('#8d7a55',{roughness:1}));fp.rotation.x=-Math.PI/2;fp.position.set(W/2,-.1,-105);S.add(fp);
+  row(16,x=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(q(2,4),50),new THREE.MeshBasicMaterial({color:'#bfeaff',transparent:true,opacity:q(.05,.1),depthWrite:false,fog:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide}));m.position.set(x,14,-q(10,40));m.rotation.z=.28;S.add(m)});
+  const cc=['#e8588d','#f08a3c','#9b5de5','#ff6f61','#ffd166','#4ecdc4'],sw=[Mt('#2e9d4a'),Mt('#1f7a46'),Mt('#4cb050')];
+  row(70,x=>{const z=-q(3.5,28),c=Mt(cc[R(6)],{roughness:.6});if(R(3)==0)dadd(GSP,c,x,.4,z,q(.5,1),q(.4,.8),q(.5,1));else for(let j=0;j<4;j++){const h=q(.8,1.9),o=dadd(GCO,c,x+q(-.4,.4),h/2,z+q(-.3,.3),.12,h,.12);o.rotation.z=q(-.4,.4);dadd(GSP,c,o.position.x,h*.98,o.position.z,.11,.11,.11)}});
+  row(80,x=>{const g=new THREE.Group(),h=q(1.5,4);g.position.set(x,0,-q(3,26));S.add(g);dadd(GCO,sw[R(3)],0,h/2,0,.14,h,.05,g);dadd(GCO,sw[R(3)],.22,h*.4,.05,.12,h*.8,.05,g);SW.push({m:g,t:'s',ph:q(0,6.28)})});
+  row(30,x=>dadd(GDO,Mt('#4d5f66',{roughness:1}),x,.3,-q(4,20),q(.4,1.4),q(.3,.8),q(.4,1.2)));
+  row(46,x=>{const s=q(.05,.16),m=dadd(GSP,Mt('#e6fbff',{transparent:true,opacity:.45,roughness:.1}),x,q(0,14),-q(3,22),s,s,s);SW.push({m,t:'b',v:q(.012,.035),ph:q(0,6.28)})});
+  row(8,x=>{const g=new THREE.Group(),jm=Mt('#ff9ad5',{transparent:true,opacity:.7,emissive:'#ff5fb8',emissiveIntensity:.6,roughness:.3});g.position.set(x,q(3,8),-q(5,14));S.add(g);dadd(GSP,jm,0,0,0,.5,.38,.5,g);for(let j=0;j<4;j++)dadd(GCY,jm,(j-1.5)*.17,-.55,0,.02,.7,.02,g);g.scale.setScalar(q(.9,1.6));bob(g,q(.5,1),1)})}
+ else if(k=='space'){sun('#fff4d6',30);
+  row(7,()=>{const m=new THREE.Mesh(GSP,new THREE.MeshBasicMaterial({color:['#7b2ff7','#2f6bff','#ff4fa3','#14c8d8'][R(4)],transparent:true,opacity:.1,depthWrite:false,fog:false}));m.scale.set(q(14,28),q(8,16),q(8,14));sk(m,.96,q(-25,25),q(10,26),-q(95,115))});
+  const ty=['gas','earth','red','ice'];for(let i=0;i<Math.max(6,Math.round(W/16));i++){const t=ty[i%4];pl(t,q(3,8),t=='gas',q(.7,.9),q(-14,14),q(6,26),-q(45,80))}
+  row(45,x=>{const s=q(.25,.9),m=dadd(GDO,Mt('#8a7f78',{roughness:1}),x,0,-q(9,30),s,s*.8,s);SW.push({m,t:'r',rx:q(-.01,.01),ry:q(-.012,.012),y0:q(3,22),ph:q(0,6.28)})});
+  row(6,x=>{const g=new THREE.Group(),au=Mt('#e0b84c',{metalness:.7,roughness:.4}),bp=Mt('#2a5db0',{metalness:.5,roughness:.3});g.position.set(x,q(4,16),-q(12,30));S.add(g);dadd(GBX,au,0,0,0,.5,.4,.4,g);[-1,1].forEach(sx=>dadd(GBX,bp,sx*.9,0,0,1.2,.04,.5,g));dadd(GCO,Mt('#ddd'),0,.4,0,.18,.3,.18,g);SW.push({m:g,t:'r',rx:0,ry:.006,y0:g.position.y,ph:q(0,6.28)})})}
+ else if(k=='moon'){sun('#ffffff',30);
+  const fp=new THREE.Mesh(new THREE.PlaneGeometry(700,130),Mt(th.g,{roughness:1}));fp.rotation.x=-Math.PI/2;fp.position.set(W/2,-.1,-105);S.add(fp);
+  pl('earth',8,0,.97,14,24,-95,W*.5);
+  row(12,x=>{const h=q(6,14),w=q(14,26);dadd(GCO,Mt('#6e6e75',{roughness:1}),x,h/2-1,-q(70,100),w,h,w)});
+  row(16,x=>{const w=q(6,14);dadd(GSP,Mt('#8e8e92',{roughness:1}),x,0,-q(15,44),w,q(1.5,4),w)});
+  row(26,x=>{const z=-q(4,40),rr=q(.8,3);dadd(new THREE.TorusGeometry(rr,.12,6,28),Mt('#a5a5a8'),x,.05,z).rotation.x=Math.PI/2;dadd(GCY,Mt('#6b6b70'),x,.03,z,rr,.02,rr)});
+  row(40,x=>dadd(GDO,Mt('#8a8a8f',{roughness:1}),x,.2,-q(4,18),q(.3,.9),q(.25,.6),q(.3,.8)));
+  row(3,x=>{const g=new THREE.Group(),au=Mt('#e0b84c',{metalness:.7,roughness:.4}),sv=Mt('#cfd4da',{metalness:.6,roughness:.4});g.position.set(x,0,-q(8,16));S.add(g);dadd(GCY,au,0,1.5,0,.8,.5,.8,g);dadd(GCO,sv,0,2.2,0,.6,.5,.6,g);[0,1,2,3].forEach(i=>{const a=i*1.5708+.78,o=dadd(GCY,sv,Math.cos(a)*.8,.7,Math.sin(a)*.8,.05,1.5,.05,g);o.rotation.z=Math.cos(a)*.5;o.rotation.x=-Math.sin(a)*.5;dadd(GCY,sv,Math.cos(a)*1.05,.05,Math.sin(a)*1.05,.25,.06,.25,g)})})}
+ else{sun('#fff7d6',24);
+  const rc=['#ff3b30','#ff9500','#ffd60a','#34c759','#32ade6','#5856d6','#af52de'],rb=new THREE.Group();rc.forEach((c,i)=>rb.add(new THREE.Mesh(new THREE.TorusGeometry(34-i*1.3,.7,6,64,Math.PI),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.5,depthWrite:false,fog:false}))));sk(rb,.94,10,-8,-92,0,W*.45);
+  const cw=Mt('#ffffff',{roughness:1,emissive:'#dbe9ff',emissiveIntensity:.35}),cloud=(x,y,z,s)=>{const g=new THREE.Group();g.position.set(x,y,z);S.add(g);for(let j=0;j<6;j++)dadd(GSP,cw,(j-2.5)*.9*s+q(-.2,.2),Math.sin(j*1.3)*.35*s,q(-.5,.5),s*q(.9,1.4),s*q(.7,1),s*q(.9,1.2),g);return g};
+  row(40,x=>cloud(x,q(-7,-2.5),-q(7,45),q(1.4,3.2)));row(20,x=>cloud(x,q(3,22),-q(12,60),q(1,2.4)));
+  row(7,x=>{const g=new THREE.Group();g.position.set(x,q(2,14),-q(14,40));S.add(g);dadd(GCO,Mt('#8d6e63',{roughness:1}),0,-1.4,0,2.4,2.8,2.4,g).rotation.x=Math.PI;dadd(GCY,Mt('#58b34e'),0,.1,0,2.5,.3,2.5,g);dadd(GCY,Mt('#6b4226'),.4,.7,0,.12,.8,.12,g);dadd(GCO,Mt('#2e7d32'),.4,1.5,0,.6,1.2,.6,g);bob(g,.5)});
+  const bc=['#ff5252','#ffb300','#40c4ff','#69f0ae','#e040fb'];
+  row(7,x=>{const g=new THREE.Group();g.position.set(x,q(4,16),-q(10,35));S.add(g);dadd(GSP,Mt(bc[R(5)],{roughness:.5}),0,1.6,0,1.1,1.3,1.1,g);dadd(GSP,Mt('#fff'),0,1.6,0,.35,1.31,1.11,g);dadd(GBX,Mt('#8d6e63'),0,-.1,0,.5,.4,.5,g);[-1,1].forEach(sx=>dadd(GCY,Mt('#555'),sx*.35,.65,0,.012,1.1,.012,g));bob(g,.6)})}
+ if(k=='space'||k=='moon'){const p=[];for(let i=0;i<1500;i++)p.push(Math.random()*(L/U+60)-20,2+Math.random()*45,-30-Math.random()*60);const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));S.add(new THREE.Points(g,new THREE.PointsMaterial({color:'#fff',size:.3,fog:false})))}}
+
+let SMP=null,GF=0,CT=null;try{claude.use('sample').then(s=>SMP=s).catch(()=>{})}catch(e){}
+async function genQ(sig){const l=CPL[su][lv],cp=cpi<0?l:[l[cpi]],tl=TP.length?TP:cp.flatMap(x=>x.t),eng=su==4,
+ man=MAN.filter(m=>m.su==su&&m.lv==lv&&(!TP.length||TP.includes(m.tp))),nm=Math.min(man.length,NQ),need=NQ-nm,parts=Math.ceil(need/10),sz=Math.ceil(need/parts);
+ const mk=n=>`Kamu pembuat soal asesmen sekolah Indonesia. Buat TEPAT ${n} soal pilihan ganda.\nJenjang: ${LVN[lv]}\nMata pelajaran: ${SUB[su].n}\nCapaian Pembelajaran: ${cp.map(x=>x.n+' ('+x.d+')').join('; ')}\nTopik yang HARUS menjadi fokus (bagi rata, setiap soal hanya membahas salah satu topik ini): ${tl.join('; ')}\nTingkat kesulitan: ${DFN[df].replace(/[^A-Za-z]/g,'')}\nJenis soal: ${su==0?'numerasi (hitungan, data, penalaran kuantitatif)':'literasi (membaca, memahami, menalar)'}.\nAturan: setiap soal memiliki stimulus berupa narasi kontekstual 2-4 kalimat yang menuntut berpikir kritis (stimulus yang sama boleh dipakai untuk maksimal 3 soal berurutan; ulangi teksnya pada tiap soal). Ada 4 pilihan jawaban, pilihan BENAR selalu pada indeks 0, pengecoh masuk akal dan setara panjangnya. Pastikan fakta, hitungan, dan kunci jawaban benar serta sesuai jenjang. ${eng?'Tulis stimulus, soal, dan pilihan dalam bahasa Inggris.':'Gunakan bahasa Indonesia baku.'} Jangan memakai topik di luar daftar.\nKeluaran: HANYA JSON array tanpa markdown, setiap elemen berkunci t (nama topik), s (stimulus), q (pertanyaan), o (array 4 pilihan, yang benar di indeks 0).\nKode variasi: ${Math.random().toString(36).slice(2,7)}`;
+ const rs=await Promise.all(Array.from({length:parts},(_,i)=>SMP.json(mk(Math.min(sz,need-i*sz)),{modelTier:'default',signal:sig})));
+ let it=[].concat(...rs).filter(x=>x&&x.q&&Array.isArray(x.o)&&x.o.length>=4).map(x=>({s:x.s||'',q:[String(x.q),x.o.slice(0,4).map(String)],tag:'Topik: '+(x.t||'')}));
+ it=shuf(man).slice(0,nm).map(m=>({s:m.s,q:[m.q,m.o],tag:'Soal manual · '+m.tp})).concat(it);
+ if(it.length<NQ){GF=1;it=it.concat(qset(NQ))}return it.slice(0,NQ)}
+async function start(){if(!(SMP&&(cpi>=0||TP.length)))return start0(null);
+ CT=new AbortController();$('gt').textContent='Menyiapkan '+NQ+' soal sesuai CP dan topik pilihanmu...';$('gl').classList.add('on');const ms=['Membaca CP dan topik pilihanmu…','Menulis stimulus narasi…','Menyusun soal dan pilihan jawaban…','Memeriksa kunci jawaban…','Menyiapkan dunia petualangan…'];let mi=0;$('gs').textContent=ms[0];const iv=setInterval(()=>{mi=Math.min(mi+1,ms.length-1);$('gs').textContent=ms[mi]},6000);
+ let qs=null;try{qs=await genQ(CT.signal)}catch(e){GF=1}
+ $('gs').textContent='Menyiapkan dunia petualangan…';clearInterval(iv);start0(qs);$('gl').classList.remove('on')}
+function start0(pre){th=TH[ti];L=520+NQ*640+300;show('game');
+ if(!Rr){try{Rr=new THREE.WebGLRenderer({canvas:$('cv'),antialias:true});}catch(e){alert('Browser tidak mendukung WebGL.');quit();return}
+  Rr.shadowMap.enabled=true;Rr.shadowMap.type=THREE.PCFSoftShadowMap;Rr.outputEncoding=THREE.sRGBEncoding;Rr.toneMapping=THREE.ACESFilmicToneMapping;Rr.toneMappingExposure=1.05;
+  C=new THREE.PerspectiveCamera(45,2,.1,400);rs();addEventListener('resize',rs);frame()}
+ S=new THREE.Scene();S.background=tex(x=>{const g=x.createLinearGradient(0,0,0,128);g.addColorStop(0,th.s[0]);g.addColorStop(1,th.s[1]);x.fillStyle=g;x.fillRect(0,0,128,128)});S.fog=new THREE.Fog(th.fog,34,(th.k=='space'||th.k=='moon'||th.k=='sky')?300:150);
+ S.add(new THREE.HemisphereLight('#ffffff',th.g,.85));DL=new THREE.DirectionalLight('#fff3dc',1.2);DL.castShadow=true;DL.shadow.mapSize.set(1024,1024);
+ const sc=DL.shadow.camera;sc.left=-24;sc.right=24;sc.top=18;sc.bottom=-18;sc.near=1;sc.far=70;S.add(DL,DL.target);
+ const gw=(L+1600)/U;const gk=GK[th.k],dp=th.big?64:14,gmt=(t,rx,ry)=>Mt('#fff',{map:gt(t,rx,ry),roughness:.95});add(GBX,[gmt(gk[1],dp/4,.5),gmt(gk[1],dp/4,.5),gmt(gk[0],gw/4,dp/4),gmt(gk[1],gw/4,.5),gmt(gk[1],gw/4,.5),gmt(gk[1],gw/4,.5)],L/80,-1,th.big?-14:0,gw,2,dp);
+ if(th.k=='forest'){const n=900,im=new THREE.InstancedMesh(new THREE.ConeGeometry(.06,.55,4),Mt('#fff',{roughness:.9}),n),m4=new THREE.Matrix4(),col=new THREE.Color();for(let i=0;i<n;i++){m4.makeRotationZ((Math.random()-.5)*.5);m4.setPosition(Math.random()*(L/U+30)-10,.25,-5+Math.random()*9);im.setMatrixAt(i,m4);im.setColorAt(i,col.setHSL(.25+Math.random()*.08,.6,.2+Math.random()*.18))}im.castShadow=true;S.add(im)}
+ decor();bg2d();JV=Math.sqrt(2*th.gr*(PHY[th.k]?PHY[th.k].ap:125));K={};score=0;lives=8;inv=0;over=0;paused=0;camX=0;FB=[];BF=[];PA=[];boss=null;
+ P={x:40,y:GY-48,w:30,h:48,vx:0,vy:0,on:1,f:1};PL=mkPlayer();S.add(PL.g);
+ NOQ=0;const qs=pre||qset(NQ);if(NOQ||GF){$('toast').textContent=GF?'Soal otomatis belum tersedia, memakai bank soal.':'Soal untuk CP/topik ini belum lengkap, memakai soal terdekat.';toast=220;GF=0}plats=[];blocks=[];coins=[];ens=[];
+ for(let i=0;i<NQ;i++){const k=i%4,tt=[[],[310,260,210],[],[310,260]][k],x=560+i*640,y=[290,160,250,210][k],pl={x,y,w:140,h:16};plats.push(pl);
+  tt.forEach((ty,j)=>{const n=tt.length;[x-50*(n-j),x+140+50*(n-1-j)].forEach(sx=>{const st={x:sx,y:ty,w:50,h:GY-ty};plats.push(st);add(GBX,Mt('#8d6e63',{roughness:.8}),X(sx+25),(GY-ty)/2/U,0,1.25,st.h/U,3)})});
+  const m=add(GBX,Mt('#a0642a',{roughness:.6}),X(x+70),Y(y+8),0,pl.w/U,.4,3);
+  const b={x:x+54,y:y-56,w:32,h:32,d:qs[i],i,done:0};b.m=add(GBX,Mt('#fff',{map:qTex('?','#f5b400'),emissive:'#664400',emissiveIntensity:.5,roughness:.3,metalness:.4}),X(b.x+16),Y(b.y+16),0,.8,.8,.8);blocks.push(b);
+  for(let j=0;j<3;j++)mkCoin(x+20+j*40,y-(j==1?100:88));
+  mkCoin(x+400,GY-50);
+  if(i%2==0||NQ<6){const e={x:x+380,y:GY-30,w:30,h:30,v:1.0,a:x+310,b:x+470};e.m=mkEnemy(th.en);S.add(e.m);ens.push(e)}mkFly(Math.random()<.5?'eagle':'bat',x+260+Math.random()*260);if(Math.random()<.35)mkFly(Math.random()<.5?'eagle':'bat',x+150+Math.random()*420)}mkFly('eagle',L-640-Math.random()*120);
+ add(GCY,Mt('#ccc',{metalness:.8}),X(L-68),1.5,0,.06,3,.06);flag=add(new THREE.PlaneGeometry(1.2,.8),new THREE.MeshStandardMaterial({map:flagTex(),side:THREE.DoubleSide}),X(L-68)+.6,2.6,0);({space:mkShip,moon:mkShip,sea:mkSub,sky:mkPlane,beach:mkJet,forest:mkJeep}[th.k]||mkSchool)(X(L-65));
+ $('qm').classList.remove('on');$('rs').classList.remove('on')}
+const BGT={
+forest:[['🌲',22,12,46,9,17,'s'],['🌳',10,12,40,7,12,'s'],['🍄',4,8,13,1.2,2,'s'],['🦌',3,9,16,2.6,3.6,'w',.03],['🐇',4,8,12,1.4,2,'h',.04],['🦊',3,9,14,1.8,2.4,'w',.05],['🐿️',3,9,13,1.2,1.7,'h',.05],['🐗',2,9,15,2,2.8,'w',.025],['🦉',3,14,30,1.5,2.4,'b',0,4,9],['🐦',5,10,30,1,1.8,'f',.1,8,20],['🦋',5,8,14,.8,1.2,'f',.03,2,6]],
+space:[['🪐',3,30,70,8,16,'f',.004,8,28],['☄️',3,25,60,3,5,'f',.25,10,30],['🛸',2,20,45,3,5,'f',.08,8,22],['🚀',2,20,50,3,5,'f',.12,6,24],['🛰️',3,25,60,2,4,'f',.03,10,28],['🌠',3,30,60,3,5,'f',.35,12,30],['⭐',10,30,70,1.5,3,'b',0,5,35]],
+moon:[['⭐',12,40,70,1.5,3,'b',0,10,35],['🚀',2,20,50,3,5,'f',.12,6,24],['🛸',2,20,45,3,5,'f',.08,8,22],['☄️',2,25,60,3,5,'f',.25,10,30],['🛰️',2,25,60,2,4,'f',.03,10,28],['🧑‍🚀',3,9,14,2,3,'w',.02],['🌑',8,12,35,2,5,'s']],
+city:[['🏢',16,14,46,10,20,'s'],['🏬',8,14,40,9,15,'s'],['🏙️',6,25,50,14,22,'s'],['🏗️',3,15,35,9,14,'s'],['🚗',5,8,9,1.8,2.4,'f',.12],['🚌',3,8,9,2.8,3.4,'f',.08],['🚕',3,8,9,1.8,2.4,'f',.1],['✈️',2,25,50,4,7,'f',.1,14,28],['🚁',2,20,40,3,5,'f',.07,10,22],['🐦',4,10,25,.9,1.4,'f',.12,6,14],['🚶',5,8,10,1.3,1.7,'w',.02],['🎈',3,14,30,2,3,'u',.03,3,20]],
+beach:[['🌴',16,10,40,7,13,'s'],['⛱️',4,8,12,2.5,3.5,'s'],['🦀',6,8,11,1.1,1.6,'w',.04],['🐚',5,8,10,.7,1.1,'s'],['🕊️',5,10,30,1.2,2,'f',.1,7,18],['⛵',3,48,70,5,8,'f',.01,2.5,3.5],['🏄',3,48,70,3,4,'f',.012,1,2],['🐬',2,48,70,3,4,'h',.05],['☀️',1,68,72,12,14,'b',0,22,24]],
+sea:[['🌿',12,10,35,3,8,'s'],['🐚',6,8,20,1,2,'s'],['🐠',10,10,45,1.5,3,'f',.06,3,16],['🐟',10,10,45,1.5,3,'f',.08,3,18],['🐡',3,10,35,1.5,2.5,'f',.04,3,12],['🐙',2,9,16,2.5,3.5,'w',.02],['🐢',3,12,25,2.5,4,'f',.025,4,12],['🦈',2,25,50,6,10,'f',.05,8,20],['🐬',2,20,45,4,6,'f',.07,6,18],['🐋',1,45,65,12,18,'f',.02,10,22],['💧',16,8,35,.8,2,'u',.04,1,24],['🦑',3,12,40,2,4,'f',.015,5,18]],
+sky:[['☁️',14,15,60,8,18,'f',.015,4,28],['🐦',6,10,35,1,1.8,'f',.1,5,22],['🎈',4,12,30,2.5,4,'u',.03,3,22],['✈️',2,30,60,4,7,'f',.12,14,28],['🪂',3,15,35,2.5,3.5,'f',.01,6,20],['🦅',3,12,35,1.8,2.8,'f',.08,8,24]]};
+const GPL=new THREE.PlaneGeometry(1,1),ET={},NF='✈️🚀🚁🛸☄️🛰️🪂🎈🌠',BX0=-45;let BGL=[],BX1=0,camY=3.2;
+function etex(e){if(ET[e])return ET[e];const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.font='100px serif';x.textAlign='center';x.textBaseline='middle';x.fillText(e,64,70);const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;return ET[e]=t}
+function bg2d(){BGL=[];BX1=L/U+45;const q=(a,b)=>a+Math.random()*(b-a);
+ if(th.k!='space'&&th.k!='sky'&&th.k!='forest'&&th.k!='moon'){const c=document.createElement('canvas');c.width=1024;c.height=256;const x=c.getContext('2d');[['#ffffff',.18,.55],[th.fog,.35,.4],[th.g,.5,.28]].forEach(([col,al,h],j)=>{x.globalAlpha=al;x.fillStyle=col;x.beginPath();x.moveTo(0,256);for(let i=0;i<=1024;i+=16)x.lineTo(i,256*(1-h)+Math.sin(i*.012*(j+1)+j*2)*28+Math.sin(i*.031+j)*12);x.lineTo(1024,256);x.fill()});const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;const o=new THREE.Mesh(new THREE.PlaneGeometry(520,100),new THREE.MeshBasicMaterial({map:t,transparent:true,fog:false,depthWrite:false}));o.position.set(L/80,30,-90);S.add(o)}
+ BGT[th.k].forEach(([e,n,za,zb,s0,s1,m,v,y0,y1])=>{if(m=='a')m='f';if(m=='s'||'🪐⭐☀️☁️'.includes(e))return;const cnt=Math.max(1,Math.round(n*(BX1-BX0)/100));
+  for(let i=0;i<cnt;i++){const z=-q(za,zb),sz=q(s0,s1)*(9.5-z)/32,o=new THREE.Mesh(GPL,new THREE.MeshBasicMaterial({map:etex(e),transparent:true,depthWrite:false})),x=q(BX0,BX1),fl=y0!=null,y=fl?q(y0,y1):sz*.42;
+   o.userData={m,v:v||0,x,hx:x,y,lo:y0,hi:y1,z,sz,fl,ph:q(0,6.28),dir:NF.includes(e)?1:(Math.random()<.5?-1:1),flip:!NF.includes(e)};S.add(o);BGL.push(o)}})}
+const GK={forest:['grass','soil'],moon:['moon','moon'],beach:['sand','sand'],city:['road','road'],sea:['sea','sea'],space:['metal','metal'],sky:['cloud','cloud']};
+function gt(k,rx,ry){const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d'),n=(a,b)=>a+Math.random()*(b-a);
+ const fill=(col,sp)=>{x.fillStyle=col;x.fillRect(0,0,256,256);for(let i=0;i<sp;i++){x.fillStyle='rgba('+(Math.random()<.5?'0,0,0':'255,255,255')+','+n(.03,.1)+')';x.fillRect(n(0,256),n(0,256),n(1,5),n(1,5))}};
+ if(k=='grass'){fill('#3f7d2e',900);for(let i=0;i<1400;i++){x.strokeStyle='hsl('+n(85,125)+',55%,'+n(22,42)+'%)';x.beginPath();const a=n(0,256),b=n(0,256);x.moveTo(a,b);x.lineTo(a+n(-3,3),b-n(4,12));x.stroke()}}
+ else if(k=='soil'){fill('#6b4a2f',1800);for(let i=0;i<60;i++){x.fillStyle='rgba(60,40,25,.5)';x.beginPath();x.arc(n(0,256),n(0,256),n(2,6),0,7);x.fill()}}
+ else if(k=='moon'){fill('#8f8f93',2500);for(let i=0;i<9;i++){const a=n(20,236),b=n(20,236),r=n(10,34);x.fillStyle='rgba(60,60,66,.55)';x.beginPath();x.arc(a,b,r,0,7);x.fill();x.strokeStyle='rgba(220,220,225,.6)';x.lineWidth=3;x.beginPath();x.arc(a-1,b-1,r+2,0,7);x.stroke()}}
+ else if(k=='sand'){fill('#e3c98a',2500);x.strokeStyle='rgba(150,115,60,.25)';x.lineWidth=2;for(let y=10;y<256;y+=18){x.beginPath();for(let a=0;a<=256;a+=8)x.lineTo(a,y+Math.sin(a*.05+y)*3);x.stroke()}}
+ else if(k=='road'){fill('#3b3f45',3000);x.fillStyle='#e8c547';x.fillRect(0,124,120,8)}
+ else if(k=='sea'){fill('#8d7a55',2000);for(let i=0;i<90;i++){x.fillStyle='hsl(35,'+n(10,25)+'%,'+n(35,60)+'%)';x.beginPath();x.ellipse(n(0,256),n(0,256),n(2,6),n(1.5,4),0,0,7);x.fill()}}
+ else if(k=='metal'){fill('#46525c',1500);x.strokeStyle='#2a343c';x.lineWidth=4;x.strokeRect(2,2,252,252);x.beginPath();x.moveTo(128,0);x.lineTo(128,256);x.moveTo(0,128);x.lineTo(256,128);x.stroke();x.fillStyle='#8fa0ad';[[14,14],[242,14],[14,242],[242,242]].forEach(p=>{x.beginPath();x.arc(p[0],p[1],4,0,7);x.fill()})}
+ else{fill('#f6faff',0);for(let i=0;i<40;i++){x.fillStyle='rgba(190,215,245,.25)';x.beginPath();x.arc(n(0,256),n(0,256),n(8,30),0,7);x.fill()}}
+ const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rx,ry);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;return t}
+function mkShip(gx){const g=new THREE.Group(),w=Mt('#eceff4',{roughness:.3,metalness:.4}),rd=Mt('#d32f2f',{roughness:.4,metalness:.3}),gl=Mt('#7fd0ff',{roughness:.05,metalness:.7,emissive:'#1e5a8a',emissiveIntensity:.5}),dk=Mt('#37474f',{metalness:.7,roughness:.4});
+ const a=(G,m,x,y,z,sx,sy,sz)=>add(G,m,x,y,z,sx,sy,sz,g);
+ const sg=(t,bg,fs)=>{const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');x.fillStyle=bg;x.fillRect(0,0,256,64);x.fillStyle='#fff';x.font='bold '+fs+'px sans-serif';x.textAlign='center';x.fillText(t,128,42);const q=new THREE.CanvasTexture(c);q.encoding=THREE.sRGBEncoding;return Mt('#fff',{map:q})};
+ a(GCY,w,0,5.2,-4.5,1.9,6.4,1.9);a(GCO,rd,0,10.1,-4.5,1.9,3.4,1.9);a(GCY,dk,0,1.75,-4.5,2.1,.5,2.1);a(GCO,dk,0,1.1,-4.5,1.2,1.2,1.2).rotation.x=Math.PI;
+ for(const s of[-1,1]){a(GBX,rd,s*2.4,3.4,-4.5,1,2.6,.3);a(GBX,dk,s*1.7,.9,-4.5,.2,1.8,.2);a(GBX,dk,s*1.7,.1,-4.5,.9,.2,.9)}
+ a(GSP,gl,0,7,-2.62,.65,.65,.15);a(GSP,gl,0,5.5,-2.62,.5,.5,.12);a(GBX,sg('STASIUN BELAJAR','#0d47a1',20),0,4.3,-2.75,2.2,.55,.3);
+ a(GBX,dk,0,2.7,-2.58,1.1,1.9,.12);a(GBX,gl,0,2.9,-2.5,.8,1.2,.06);a(GBX,Mt('#9aa3ad',{metalness:.5,roughness:.5}),0,1.2,-1.7,1.3,.12,3.4).rotation.x=.5;
+ a(GCY,Mt('#ccc',{metalness:.8}),4,2.5,-2,.05,5,.05);a(new THREE.PlaneGeometry(1.5,1),new THREE.MeshStandardMaterial({map:flagTex(),side:THREE.DoubleSide}),4.8,4.5,-2,1,1,1);
+ g.scale.setScalar(.8);g.position.set(gx,0,0);S.add(g)}
+function mkSub(gx){const g=new THREE.Group(),yl=Mt('#ffc928',{roughness:.35,metalness:.3}),gl=Mt('#9fe3ff',{roughness:.05,metalness:.6,emissive:'#2b6a8c',emissiveIntensity:.6}),dk=Mt('#37474f',{metalness:.7,roughness:.4});
+ const a=(G,m,x,y,z,sx,sy,sz)=>add(G,m,x,y,z,sx,sy,sz,g),zz=x=>-4.2+1.9*Math.sqrt(1-(x/6.2)**2)-.05;
+ a(GSP,yl,0,2.4,-4.2,6.2,1.9,1.9);a(GCY,yl,.8,4.4,-4.2,1,1.6,.9);a(GCY,dk,1.9,5,-4.2,.07,2.6,.07);a(GBX,dk,2.15,6.3,-4.2,.5,.15,.15);
+ for(const x of[-3,-1.8,1.8,3])a(GSP,gl,x,2.6,zz(x),.32,.32,.12);
+ a(GBX,dk,.8,4.2,-3.72,.6,.95,.08);a(GBX,gl,.8,4.5,-3.68,.35,.35,.06);
+ a(GCY,dk,0,2.4,-2.32,.6,.12,.6).rotation.x=Math.PI/2;a(GBX,Mt('#9aa3ad',{metalness:.5,roughness:.5}),0,1.2,-1.5,1.3,.1,2.8).rotation.x=.45;
+ a(GBX,dk,-6.4,2.4,-4.2,.25,.5,.5);a(GBX,dk,-6.6,2.4,-4.2,.1,1.6,.25);a(GBX,yl,-5.6,3.7,-4.2,.15,1.2,1.2);a(GSP,Mt('#fff7b0',{emissive:'#fff7b0',emissiveIntensity:1}),5.9,2.5,-4.2,.25,.25,.25);
+ a(GCY,Mt('#ccc',{metalness:.8}),.8,6.1,-4.2,.04,1.8,.04);a(new THREE.PlaneGeometry(1.3,.85),new THREE.MeshStandardMaterial({map:flagTex(),side:THREE.DoubleSide}),1.5,6.6,-4.2,1,1,1);
+ g.position.set(gx,0,0);S.add(g)}
+const HS={},HB=$('hb'),hx=HB.getContext('2d');let hW=0,hH=0,ht=0;
+function hrs(){hW=HB.width=innerWidth;hH=HB.height=innerHeight}addEventListener('resize',hrs);hrs();
+function hmk(k){const a=[];BGT[k].forEach(([e,n,za,zb,s0,s1,m,v,y0,y1])=>{if(m=='a')m='f';for(let i=0;i<Math.max(1,Math.round(n/5));i++)a.push({e,m,x:Math.random(),hx:0,z:(za+zb)/2,s:(s0+s1)/2*(.8+Math.random()*.4),v:(v||0)*.02,fl:y0!=null,yv:y0==null?0:y0+Math.random()*(y1-y0),dir:NF.includes(e)?1:(Math.random()<.5?-1:1),ph:Math.random()*6.28,nf:NF.includes(e)})});a.forEach(o=>o.hx=o.x);return a}
+function hd(i,al){const t2=TH[i],k=t2.k,gy=hH*.8,sp=HS[k]||(HS[k]=hmk(k));hx.globalAlpha=al;
+ const g=hx.createLinearGradient(0,0,0,gy);g.addColorStop(0,t2.s[0]);g.addColorStop(1,t2.s[1]);hx.fillStyle=g;hx.fillRect(0,0,hW,hH);
+ for(let j=0;j<2;j++){hx.globalAlpha=al*(j?.5:.35);hx.fillStyle=j?t2.fog:t2.g;hx.beginPath();hx.moveTo(0,gy);for(let x=0;x<=hW+20;x+=20)hx.lineTo(x,gy-hH*(.07+.05*j)-Math.sin(x*.004+j*2+ht*.004)*hH*.03);hx.lineTo(hW,gy);hx.fill()}
+ hx.globalAlpha=al;hx.fillStyle=t2.g;hx.fillRect(0,gy,hW,hH-gy);hx.fillStyle=t2.t;hx.fillRect(0,gy,hW,hH*.012);hx.textAlign='center';
+ sp.sort((a,b)=>b.z-a.z).forEach(o=>{const s=o.s*hH*.03;let y;
+  if(o.m=='w'||o.m=='h'){o.x+=o.v*o.dir*.35;if(Math.abs(o.x-o.hx)>.15)o.dir*=-1}
+  else if(o.m=='f'){o.x+=o.v*o.dir*.45;if(o.x>1.1)o.x=-.1;if(o.x<-.1)o.x=1.1}
+  else if(o.m=='u'){o.yv+=o.v*50;if(o.yv>28)o.yv=1}
+  if(o.fl)y=gy-hH*.7*Math.min(o.yv,32)/32+Math.sin(ht*.04+o.ph)*hH*.01;
+  else y=gy+hH*.025-(o.z-8)/40*hH*.05-(o.m=='h'?Math.abs(Math.sin(ht*.14+o.ph))*s*.5:0);
+  hx.save();hx.translate(o.x*hW,y);if(!o.nf&&o.dir>0)hx.scale(-1,1);hx.font=s+'px serif';hx.textBaseline=o.fl?'middle':'bottom';hx.fillText(o.e,0,0);hx.restore()})}
+function hl(){requestAnimationFrame(hl);if(!$('home').classList.contains('on'))return;ht++;const n=TH.length,c=Math.floor(ht/420)%n,p=ht%420;hx.globalAlpha=1;if(p<60)hd((c+n-1)%n,1);hd(c,p<60?p/60:1)}hl();
+function sgm(t,bg,fs){const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');x.fillStyle=bg;x.fillRect(0,0,256,64);x.fillStyle='#fff';x.font='bold '+fs+'px sans-serif';x.textAlign='center';x.fillText(t,128,44);const q=new THREE.CanvasTexture(c);q.encoding=THREE.sRGBEncoding;return Mt('#fff',{map:q})}
+const VF=()=>new THREE.MeshStandardMaterial({map:flagTex(),side:THREE.DoubleSide}),FP=()=>new THREE.PlaneGeometry(1.3,.85);
+function mkJeep(gx){const g=new THREE.Group(),bd=Mt('#ff6d00',{roughness:.35,metalness:.4}),dk=Mt('#212121',{roughness:.6}),gl=Mt('#9fe3ff',{roughness:.05,metalness:.6,emissive:'#2b6a8c',emissiveIntensity:.4}),sv=Mt('#cfd8dc',{metalness:.8,roughness:.3}),Z=-3.6;
+ const a=(G,m,x,y,z,sx,sy,sz)=>add(G,m,x,y,z,sx,sy,sz,g);
+ a(GBX,bd,0,1.6,Z,6,1.1,2.8);a(GBX,bd,-2.1,2.35,Z,1.9,.5,2.6);a(GBX,bd,.7,2.95,Z,2.7,1.3,2.6);
+ a(GBX,gl,.2,3.05,Z+1.31,1,.8,.06);a(GBX,gl,1.3,3.05,Z+1.31,1,.8,.06);a(GBX,gl,-.67,3.05,Z,.06,.8,2.3);
+ a(GBX,dk,.7,3.65,Z,2.9,.1,2.8);a(GBX,sv,.7,3.8,Z+1.2,2.6,.08,.08);a(GBX,sv,.7,3.8,Z-1.2,2.6,.08,.08);a(GBX,Mt('#4e342e'),.9,4.1,Z,1.6,.5,1.2);
+ a(GBX,Mt('#bf360c'),.7,2.4,Z+1.41,1.5,1.3,.04);a(GBX,sv,1.3,2.7,Z+1.44,.3,.08,.04);a(GBX,sgm('PETUALANGAN','#1b5e20',26),.2,1.55,Z+1.42,2.8,.7,.04);
+ const wl=(x,z)=>{a(GCY,dk,x,.8,z,.8,.5,.8).rotation.x=Math.PI/2;a(GCY,sv,x,.8,z+(z>Z?.27:-.27),.4,.05,.4).rotation.x=Math.PI/2};wl(-2,Z+1.5);wl(-2,Z-1.5);wl(2.1,Z+1.5);wl(2.1,Z-1.5);
+ a(GBX,dk,-3.1,1.2,Z,.3,.45,3);for(const s of[-1,1])a(GSP,Mt('#fff7b0',{emissive:'#fff7b0',emissiveIntensity:1}),-3.05,1.9,Z+s*.9,.25,.25,.25);
+ a(GCY,dk,3.25,2,Z,.65,.35,.65).rotation.z=Math.PI/2;a(GBX,Mt('#d50000'),3.1,2.9,Z+1,.35,.5,.2);
+ a(GCY,sv,3,4.4,Z-1.2,.03,2.4,.03);a(FP(),VF(),3.7,5.2,Z-1.2,1,1,1);
+ g.scale.setScalar(.95);g.position.set(gx,0,0);S.add(g)}
+function mkJet(gx){const g=new THREE.Group(),rd=Mt('#ff1744',{roughness:.25,metalness:.4}),wh=Mt('#ffffff',{roughness:.3}),dk=Mt('#212121'),gl=Mt('#9fe3ff',{roughness:.05,metalness:.6,transparent:true,opacity:.75}),wd=Mt('#8d6e63',{roughness:.8}),Z=-3.2;
+ const a=(G,m,x,y,z,sx,sy,sz)=>add(G,m,x,y,z,sx,sy,sz,g);
+ a(GBX,wd,0,.1,Z,8,.25,3.4);a(GSP,rd,0,1.2,Z,2.6,.75,1);a(GBX,wh,-.2,1.95,Z,2.6,.28,.95);a(GCO,rd,2.7,1.3,Z,.8,1.4,.7).rotation.z=-Math.PI/2;
+ a(GBX,dk,-.7,2.25,Z,1.3,.3,.55);a(GCY,dk,.9,2.5,Z,.07,.9,.07);a(GBX,dk,.9,2.95,Z,.12,.1,1.1);a(GBX,gl,1.3,2.7,Z,.06,.75,.8).rotation.z=.4;
+ a(GBX,Mt('#0277bd'),-.2,1.2,Z+.95,2.8,.18,.04);a(GCY,dk,-2.7,1.2,Z,.35,.5,.35).rotation.z=Math.PI/2;
+ a(GCY,wd,-3.2,.8,Z+1.55,.06,1.6,.06);a(GBX,sgm('JET SKI','#0277bd',34),-3.2,1.7,Z+1.55,2,.5,.06);
+ a(GCY,Mt('#cfd8dc',{metalness:.8}),3.4,2.4,Z-1.4,.03,2.4,.03);a(FP(),VF(),4.05,3.1,Z-1.4,1,1,1);
+ g.scale.setScalar(1.25);g.position.set(gx,0,0);S.add(g)}
+function mkPlane(gx){const g=new THREE.Group(),wh=Mt('#ffffff',{roughness:.25,metalness:.3}),rd=Mt('#e53935',{roughness:.3,metalness:.3}),bl=Mt('#1565c0',{roughness:.3,metalness:.3}),dk=Mt('#212121'),sv=Mt('#cfd8dc',{metalness:.8,roughness:.3}),gl=Mt('#9fe3ff',{roughness:.05,metalness:.6,emissive:'#2b6a8c',emissiveIntensity:.4}),Z=-4;
+ const a=(G,m,x,y,z,sx,sy,sz)=>add(G,m,x,y,z,sx,sy,sz,g);
+ a(GCY,wh,0,3.2,Z,.95,7.4,.95).rotation.z=Math.PI/2;a(GCO,rd,4.5,3.2,Z,.95,1.7,.95).rotation.z=-Math.PI/2;a(GCO,wh,-4.6,3.4,Z,.9,1.8,.9).rotation.z=Math.PI/2;
+ a(GBX,rd,-4.4,4.6,Z,1.2,1.7,.18);a(GBX,bl,-4.5,3.5,Z,1,.14,3.2);a(GBX,bl,.6,2.85,Z,2.2,.16,8.4);
+ for(const s of[-1,1])a(GCY,sv,.9,2.45,Z+s*2.4,.45,1.4,.45).rotation.z=Math.PI/2;
+ a(GBX,gl,3.3,3.5,Z+.82,.9,.4,.05);for(let i=0;i<5;i++)a(GBX,gl,-2.6+i*.75,3.4,Z+.94,.35,.4,.05);
+ a(GBX,bl,-.1,3,Z+.945,7.4,.18,.03);a(GBX,rd,2.3,3.1,Z+.94,.75,1.5,.05);a(GBX,Mt('#b0bec5',{metalness:.5}),2.3,1.5,Z+1.9,.9,.1,2.4).rotation.x=.5;
+ for(const [x,z] of[[3.2,0],[.6,1.2],[.6,-1.2]]){a(GCY,dk,x,.55,Z+z,.5,.28,.5).rotation.x=Math.PI/2;a(GCY,sv,x,1.4,Z+z,.05,1.7,.05)}
+ a(GCY,sv,-4.4,6,Z,.03,1.2,.03);a(FP(),VF(),-3.75,6.3,Z,1,1,1);
+ g.scale.setScalar(.9);g.position.set(gx,0,0);S.add(g)}
+let FB=[],BF=[],boss=null,LS=-99;
+(()=>{const b=$('jsb'),k=$('jsk');let id=null;const up=e=>{const r=b.getBoundingClientRect(),R=r.width/2;let dx=e.clientX-(r.left+R),dy=e.clientY-(r.top+R);const d=Math.hypot(dx,dy);if(d>R*.6){dx*=R*.6/d;dy*=R*.6/d}k.style.transform='translate('+dx+'px,'+dy+'px)';K.l=dx<-R*.18?1:0;K.r=dx>R*.18?1:0};b.onpointerdown=e=>{e.preventDefault();id=e.pointerId;b.setPointerCapture(id);up(e)};b.onpointermove=e=>{if(e.pointerId==id)up(e)};const en=e=>{if(e.pointerId==id){id=null;k.style.transform='';K.l=0;K.r=0}};b.onpointerup=en;b.onpointercancel=en})();
+function shoot(){if(over||paused||!P||fr-LS<14)return;LS=fr;const m=new THREE.Group();const sa=th.k=='sea';add(GSP,Mt(sa?'#4fc3f7':'#ff6d00',{emissive:sa?'#0288d1':'#ff3d00',emissiveIntensity:1.6,transparent:true,opacity:.9}),0,0,0,.3,.3,.3,m);add(GSP,Mt(sa?'#e1f5fe':'#ffeb3b',{emissive:sa?'#b3e5fc':'#ffd600',emissiveIntensity:2}),0,0,0,.16,.16,.16,m);S.add(m);FB.push({x:P.x+(P.f>0?P.w:-16),y:P.y+14,w:16,h:16,vx:6*P.f,t:0,m})}
+addEventListener('keydown',e=>{if(!e.repeat&&e.key.length==1&&'fFxX'.includes(e.key))shoot()});$('bf').onpointerdown=e=>{e.preventDefault();shoot()};
+const BN=`0.0.0.1|1|KPK dari 4 dan 6 adalah...|12|24|10|2
+0.0.0.1|1|FPB dari 12 dan 18 adalah...|6|3|9|36
+0.0.0.2|1|1/2 + 1/4 = ...|3/4|2/6|1/6|2/4
+0.0.1.0|0|Pola bilangan 3, 6, 9, 12, ... Bilangan berikutnya adalah...|15|14|16|18
+0.0.2.1|1|Film berdurasi 90 menit. Durasi itu sama dengan...|1 jam 30 menit|1 jam 9 menit|9 jam|2 jam
+0.0.4.0|1|Dalam diagram batang, apel = 8, jeruk = 5, dan pisang = 7. Buah yang paling sedikit adalah...|jeruk|apel|pisang|semuanya sama
+0.0.4.2|2|Sebuah dadu dilempar sekali. Peluang muncul angka genap adalah...|3/6|1/6|2/6|4/6
+0.1.0.1|1|Bentuk notasi ilmiah dari 3.500.000 adalah...|3,5 × 10⁶|35 × 10⁵|0,35 × 10⁷|3,5 × 10⁵
+0.1.1.1|0|Penyelesaian 2x + 5 = 17 adalah x = ...|6|11|5|12
+0.1.1.3|2|Jumlah dua bilangan 12 dan selisihnya 4. Bilangan yang lebih besar adalah...|8|4|6|10
+0.1.2.0|1|Lingkaran berjari-jari 7 cm. Keliling lingkaran (π = 22/7) adalah...|44 cm|22 cm|154 cm|49 cm
+0.1.2.1|1|Luas permukaan kubus dengan rusuk 3 cm adalah...|54 cm²|27 cm²|18 cm²|36 cm²
+0.1.2.2|0|Volume kubus dengan rusuk 5 cm adalah...|125 cm³|25 cm³|150 cm³|15 cm³
+0.1.3.2|0|Segitiga siku-siku bersisi 6 cm dan 8 cm. Panjang hipotenusanya adalah...|10 cm|14 cm|12 cm|9 cm
+0.1.4.0|0|Rata-rata dari 4, 6, 8, 10, dan 12 adalah...|8|10|6|7
+0.1.4.2|1|Kantong berisi 3 bola merah dan 2 bola biru. Peluang terambil bola biru adalah...|2/5|3/5|1/5|2/3
+0.2.0.0|0|Nilai dari 2⁵ × 2³ adalah...|256|64|128|32
+0.2.0.1|1|Suku ke-10 barisan 3, 7, 11, ... adalah...|39|43|37|35
+0.2.1.1|1|Sumbu simetri fungsi f(x) = x² − 4x + 3 adalah x = ...|2|−2|4|1
+0.2.1.3|2|Jika f(x) = 2x + 1 dan g(x) = x², maka (f∘g)(3) = ...|19|49|13|25
+0.2.2.0|1|Pada segitiga siku-siku, nilai sin 30° adalah...|1/2|√3/2|1|√2/2
+0.2.3.3|1|Banyak cara memilih 2 orang dari 5 orang adalah...|10|20|5|25
+0.2.3.2|2|Dua koin dilempar bersamaan. Peluang muncul dua angka adalah...|1/4|1/2|1/3|3/4
+0.2.0.2|2|Modal Rp1.000.000 berbunga majemuk 10% per tahun. Nilai akhir setelah 2 tahun adalah...|Rp1.210.000|Rp1.200.000|Rp1.100.000|Rp1.020.000
+1.0.0.0|1|Saat mendengar pengumuman sekolah, sikap yang tepat adalah...|menyimak dengan tenang|mengobrol|bermain|pergi
+1.0.0.1|2|Guru bercerita tentang kancil yang menipu buaya agar bisa menyeberang. Sikap yang tidak patut ditiru adalah...|menipu orang lain|berpikir cepat|berani|mencari akal
+1.0.2.1|1|Urutan menceritakan pengalaman yang tepat adalah...|awal, kejadian, akhir|akhir, awal, kejadian|kejadian, akhir, awal|acak
+1.0.3.0|0|Kalimat yang tersusun benar adalah...|Adik makan nasi.|Makan adik nasi.|Nasi makan adik.|adik nasi makan
+1.0.3.3|2|Bagian awal karangan narasi biasanya berisi...|pengenalan tokoh dan tempat|penyelesaian masalah|kesimpulan akhir|daftar pustaka
+1.0.1.0|1|Ide pokok paragraf ‘Kucing memiliki kumis. Kumis membantu kucing merasakan sekitar.’ adalah...|fungsi kumis kucing|warna kucing|makanan kucing|rumah kucing
+1.1.1.0|1|‘Jalanan basah dan semua orang membawa payung.’ Makna tersirat kalimat itu adalah...|sedang atau baru saja hujan|cuaca sangat panas|jalan sedang dibangun|payung dijual murah
+1.1.0.0|1|Saat menyimak berita radio, gagasan utama paling mudah ditemukan dengan mencatat...|kata kunci tiap informasi|setiap kata berita|hanya iklan|nama penyiar saja
+1.1.0.1|1|Pelaku utama dalam sebuah cerita disebut...|tokoh utama|latar|alur|amanat
+1.1.2.0|2|Untuk mengusulkan solusi banjir secara lisan, kalimat yang tepat adalah...|Saya mengusulkan kita membersihkan saluran air bersama-sama.|Banjir itu salah pemerintah saja.|Terserah saja banjir.|Aku tidak peduli.
+1.1.3.0|1|Teks yang memberitakan peristiwa aktual disebut teks...|berita|puisi|prosedur|fabel
+1.1.3.1|1|Penulisan yang benar adalah...|Dia pergi ke Bandung pada hari Senin.|dia pergi ke bandung pada hari senin.|Dia pergi kebandung pada hari Senin.|Dia pergi ke Bandung pada hari senin.
+1.1.3.2|1|Ungkapan ‘ia berhati batu’ bermakna...|tidak mudah iba|hatinya terbuat dari batu|suka membawa batu|berhati lembut
+1.1.1.1|2|Pernyataan yang menunjukkan sikap kontra adalah...|Saya tidak setuju seragam diganti karena biayanya mahal.|Saya setuju seragam baru.|Seragam baru bagus sekali.|Saya tidak punya pendapat.
+1.2.1.1|2|Ciri artikel yang kredibel adalah...|mencantumkan sumber dan data yang dapat diperiksa|memakai judul sensasional|tanpa nama penulis|hanya opini tanpa bukti
+1.2.1.2|2|Teks A menekankan manfaat kendaraan listrik, teks B menekankan biayanya. Membandingkan kedua teks berarti...|menelaah persamaan, perbedaan, dan sudut pandangnya|membaca teks yang lebih pendek|menyalin salah satu teks|memilih tanpa membaca
+1.2.2.1|2|‘Sekolah sebaiknya dimulai lebih siang karena penelitian menunjukkan remaja butuh tidur lebih lama.’ Kalimat itu memuat...|alasan yang didukung bukti|serangan pribadi|ajakan tanpa dasar|pengulangan kata
+1.2.2.2|2|Dalam debat, pembicara yang baik...|menanggapi argumen lawan dengan sopan dan berdata|memotong pembicaraan|mengabaikan lawan|mengulang pendapat yang sama
+1.2.0.0|1|Saat menyimak pidato, cara mengevaluasi gagasan yang tepat adalah...|menilai kesesuaian argumen dengan fakta|menghafal seluruh kalimat|menghitung jumlah kata|menilai kerasnya suara
+1.2.3.2|1|Kata baku yang tepat adalah...|risiko|resiko|riziko|risigo
+2.0.0.0|0|Air yang dibekukan berubah menjadi...|es|uap|embun|awan
+2.0.0.1|1|Air yang dipanaskan hingga mendidih berubah wujud menjadi...|gas (uap air)|padat|es|pasir
+2.0.1.0|1|Organ tubuh untuk bernapas adalah...|paru-paru|lambung|jantung|usus
+2.0.1.1|1|Tumbuhan membuat makanan sendiri dengan bantuan...|cahaya matahari|cahaya lampu saja|angin|garam
+2.0.1.2|1|Kupu-kupu mengalami perubahan dari ulat melalui tahap...|kepompong|telur|bayi|anak
+2.0.2.0|1|Mendorong dan menarik benda disebut...|gaya|energi|cahaya|panas
+2.0.3.1|0|Matahari terbit di arah...|timur|barat|utara|selatan
+2.1.0.0|0|Organ yang menghasilkan empedu adalah...|hati|lambung|usus halus|pankreas
+2.1.0.1|1|Pembakaran kertas termasuk perubahan...|kimia|fisika|wujud|bentuk
+2.1.0.3|1|Gaya gesek bekerja...|berlawanan arah gerak benda|searah gerak benda|tegak lurus gerak benda|hanya di ruang hampa
+2.1.0.4|2|Air 2 kg dipanaskan (c = 4.200 J/kg°C) hingga suhunya naik 10°C. Kalor yang diperlukan adalah...|84.000 J|8.400 J|42.000 J|840.000 J
+2.1.0.5|1|Pada rangkaian listrik seri, arus di setiap lampu...|sama besar|berbeda-beda|nol|bergantung warna lampu
+2.1.0.2|2|Upaya individu yang paling efektif mengurangi emisi gas rumah kaca adalah...|menghemat listrik dan memakai transportasi umum|membakar sampah|menebang pohon|memakai kendaraan pribadi sendirian
+2.1.1.1|2|Agar hasil percobaan dapat dipercaya, percobaan sebaiknya...|diulang beberapa kali|dilakukan sekali saja|dicatat dari ingatan|tanpa alat ukur
+2.1.1.3|2|Siswa menyimpulkan ‘garam mempercepat es mencair’ dari satu percobaan. Refleksi yang tepat adalah...|mengujinya ulang dengan variasi dan kontrol|langsung yakin sepenuhnya|menghapus data|mengubah kesimpulan agar sama dengan teman
+2.2.0.0|1|Interaksi yang menguntungkan kedua organisme disebut...|mutualisme|parasitisme|predasi|kompetisi
+2.2.0.1|1|Mobil dari keadaan diam bergerak dengan percepatan 2 m/s² selama 5 s. Kecepatannya adalah...|10 m/s|2,5 m/s|7 m/s|25 m/s
+2.2.0.2|1|Energi alternatif yang memanfaatkan aliran air disebut energi...|hidro (air)|batu bara|minyak bumi|gas alam
+2.2.0.3|2|Massa molekul relatif CO₂ (Ar C = 12, O = 16) adalah...|44|28|32|56
+2.2.0.4|2|Upaya mitigasi perubahan iklim jangka panjang yang paling berdampak adalah...|beralih ke energi terbarukan dan menjaga hutan|menambah kendaraan bermotor|membakar lahan|menambah pabrik batu bara
+2.2.1.3|2|Grafik tren suhu dipakai menarik kesimpulan. Yang perlu dievaluasi adalah...|jumlah data dan sumber pengukurannya|warna grafik|ukuran huruf|judul grafik saja
+3.0.0.0|1|Arah mata angin di antara utara dan timur adalah...|timur laut|barat daya|tenggara|barat laut
+3.0.0.1|1|Air, hutan, dan tanah termasuk...|sumber daya alam|barang buatan|alat produksi|jasa
+3.0.0.2|1|Cara menjaga kebersihan lingkungan rumah adalah...|membuang sampah pada tempatnya|membuang sampah ke selokan|membakar sampah plastik|menumpuk sampah
+3.0.1.0|1|Petani yang menghasilkan beras disebut...|produsen|konsumen|distributor|pembeli
+3.0.2.0|1|Tari Saman berasal dari daerah...|Aceh|Bali|Jawa Barat|Papua
+3.0.2.2|1|Lambang sila ketiga Pancasila adalah...|pohon beringin|bintang|rantai|padi dan kapas
+3.0.3.0|1|Naskah Proklamasi dibacakan oleh...|Ir. Soekarno|Ki Hajar Dewantara|R.A. Kartini|Pangeran Diponegoro
+3.1.0.0|1|Indonesia terletak di antara dua benua, yaitu...|Asia dan Australia|Afrika dan Eropa|Amerika dan Asia|Eropa dan Australia
+3.1.0.2|1|Tindakan benar saat gempa di dalam gedung adalah...|berlindung di bawah meja kokoh lalu evakuasi|menggunakan lift|berdiri dekat kaca|berlari tanpa arah
+3.1.0.1|2|Dampak perubahan iklim bagi daerah pesisir adalah...|naiknya permukaan air laut|turunnya suhu bumi|bertambahnya hutan|berkurangnya hujan di laut
+3.1.1.1|2|Jika permintaan beras naik dan persediaan tetap, harga beras cenderung...|naik|turun|tetap|nol
+3.1.1.2|2|Contoh adaptasi UMKM terhadap ekonomi digital adalah...|berjualan lewat marketplace dan media sosial|menutup toko|menurunkan kualitas|menolak pembayaran nontunai
+3.1.2.2|2|Konflik antarteman sebaiknya diselesaikan dengan...|musyawarah dan saling mendengar|kekerasan|saling menjauh selamanya|menyebarkan gosip
+3.1.3.0|1|Sumpah Pemuda diikrarkan pada tahun...|1928|1945|1908|1966
+3.1.3.1|2|Bangsa Eropa datang ke Nusantara terutama untuk mencari...|rempah-rempah|emas dari laut|mobil|minyak sawit
+3.2.0.0|1|Lapisan batuan kulit bumi disebut...|litosfer|atmosfer|hidrosfer|biosfer
+3.2.0.2|2|Mitigasi banjir yang bersifat nonstruktural adalah...|edukasi dan sistem peringatan dini|membangun tanggul|membuat waduk|mengeruk sungai
+3.2.1.1|2|Jika harga naik 8% dan upah naik 5%, daya beli masyarakat cenderung...|menurun|meningkat|tidak berubah|menjadi nol
+3.2.1.2|2|Penawaran keuntungan sangat tinggi tanpa risiko patut dicurigai sebagai...|investasi bodong|obligasi negara|deposito|reksa dana resmi
+3.2.2.0|1|Sikap yang tepat dalam masyarakat multikultural adalah...|toleransi|etnosentrisme|diskriminasi|segregasi
+3.2.2.1|1|Interaksi sosial berupa kerja sama tampak pada...|bakti sosial warga|perebutan lahan|perselisihan|persaingan curang
+3.2.3.2|2|Kerajaan Islam pertama di Nusantara adalah...|Samudra Pasai|Demak|Mataram Islam|Banten
+3.2.3.1|1|Candi Borobudur dibangun pada masa dinasti...|Syailendra|Sanjaya|Isyana|Warmadewa
+4.0.0.0|1|‘Nice to meet you.’ The best reply is...|Nice to meet you, too.|I am hungry.|See you yesterday.|It is red.
+4.0.0.1|1|‘I wake up at six.’ This sentence tells about...|a daily routine|a favorite color|a family|the weather
+4.0.1.1|1|A cow eats grass. What does a cow eat?|Grass|Fish|Bread|Meat
+4.0.1.0|1|My father’s mother is my...|grandmother|sister|aunt|cousin
+4.0.2.0|1|Arrange the words: reads / book / She / a|She reads a book.|Reads she a book.|A book she reads.|Book a reads she.
+4.0.2.1|0|Two ___ are on the table.|apples|apple|an apple|a apples
+4.1.0.0|1|‘How much is this shirt?’ The answer is...|It is fifty thousand rupiah.|It is blue.|Yes, it is.|At school.
+4.1.1.0|1|‘The cat has soft white fur and green eyes.’ This is a ___ text.|descriptive|procedure|recount|announcement
+4.1.1.3|2|‘Rina brought an umbrella, although the sky was clear.’ We can infer that Rina...|thought it might rain|hates umbrellas|lost her bag|was late
+4.1.2.0|1|Last week, I ___ my grandmother.|visited|visit|visiting|visits
+4.1.2.1|1|‘First, I woke up. Then, I took a bath.’ This is a ___ text.|recount|procedure|descriptive|announcement
+4.1.2.2|2|‘In my opinion, students should read every day.’ The writer is...|giving an opinion|giving directions|describing a place|telling a joke
+4.2.0.1|1|‘I disagree, because the evidence is limited.’ This is used to...|express an opinion politely|ask for directions|apologize|order food
+4.2.1.0|1|In a narrative text, the ‘complication’ is where...|the problem appears|the story ends|the characters are introduced|the moral is stated
+4.2.1.1|1|A thesis statement in an exposition text appears in the...|introduction|reference list|title only|last line only
+4.2.1.2|2|A discussion text usually presents...|arguments for and against an issue|only one opinion|a funny story|a recipe
+4.2.2.1|1|If I had more time, I ___ more books.|would read|will read|read|reading
+4.2.1.3|2|‘Sales rose after the discount, so the discount must be the only cause.’ A critical reader should...|check other possible causes|accept it immediately|ignore the sales|reject all discounts
+0.0.0.0|0|Hasil dari 345 + 278 adalah ...|623|613|523|633
+0.0.0.0|1|Hasil dari 156 : 12 adalah ...|13|12|14|15
+0.0.0.0|2|Sebuah toko memiliki 12 kotak pensil dan tiap kotak berisi 24 pensil. Jika 85 pensil terjual, sisa pensil adalah ...|203|193|213|373
+0.0.0.1|0|FPB dari 12 dan 18 adalah ...|6|3|36|9
+0.0.0.1|2|Bu Rina berbelanja ke pasar setiap 6 hari, sedangkan Pak Budi setiap 8 hari. Hari ini mereka bertemu di pasar. Mereka bertemu lagi setelah ... hari.|24|48|14|12
+0.0.0.2|0|Bentuk desimal dari pecahan 1/4 adalah ...|0,25|0,14|0,4|2,5
+0.0.0.2|2|Ibu membeli beras 2 1/2 kg. Ibu memakai 0,75 kg lalu memberi 3/4 kg kepada tetangga. Sisa beras Ibu adalah ...|1 kg|1,25 kg|0,75 kg|1,5 kg
+0.0.0.3|0|Uang pecahan Rp5.000 sebanyak 4 lembar bernilai ...|Rp20.000|Rp9.000|Rp15.000|Rp2.000
+0.0.0.3|0|Di antara uang berikut, yang nilainya paling besar adalah ...|2 lembar Rp50.000|9 lembar Rp10.000|40 lembar Rp2.000|15 lembar Rp5.000
+0.0.0.3|1|Dani membeli buku Rp7.500 dan pensil Rp2.500, lalu membayar dengan uang Rp20.000. Uang kembalian Dani adalah ...|Rp10.000|Rp12.500|Rp9.000|Rp5.000
+0.0.0.3|2|Ayah menabung Rp15.000 setiap minggu. Setelah 8 minggu, tabungan dipakai membeli sepatu seharga Rp95.000. Sisa tabungan Ayah adalah ...|Rp25.000|Rp35.000|Rp15.000|Rp215.000
+0.0.1.0|1|Perhatikan pola bilangan 3, 7, 11, 15, ... Bilangan berikutnya adalah ...|19|18|20|21
+0.0.1.0|2|Pola bilangan 2, 5, 8, 11, ... Suku ke-10 dari pola tersebut adalah ...|29|32|30|28
+0.0.1.0|1|Pola bilangan 2, 4, 8, 16, ... Bilangan berikutnya adalah ...|32|24|30|20
+0.0.1.1|0|Di kelas ada 12 siswa laki-laki dan 18 siswa perempuan. Perbandingan laki-laki dan perempuan dalam bentuk paling sederhana adalah ...|2 : 3|3 : 2|1 : 6|4 : 9
+0.0.1.1|1|Perbandingan kelereng Ali dan Budi adalah 3 : 5. Jika Ali memiliki 15 kelereng, kelereng Budi berjumlah ...|25|9|18|45
+0.0.1.1|1|Resep kue memerlukan 2 cangkir tepung untuk 10 kue. Untuk membuat 25 kue diperlukan tepung ...|5 cangkir|4 cangkir|6 cangkir|7 cangkir
+0.0.1.1|2|Sebuah mobil menempuh 180 km dalam 3 jam dengan kecepatan tetap. Jarak yang ditempuh dalam 5 jam adalah ...|300 km|270 km|360 km|240 km
+0.0.1.2|0|Kalimat matematika dari 'Bilangan n ditambah 7 hasilnya 15' adalah ...|n + 7 = 15|n - 7 = 15|7 x n = 15|n + 15 = 7
+0.0.1.2|0|Nilai n yang memenuhi n + 9 = 14 adalah ...|5|23|6|4
+0.0.1.2|1|Nilai yang tepat untuk mengganti tanda ? pada 8 x ? = 72 adalah ...|9|8|64|80
+0.0.1.2|2|Harga sebuah buku Rp15.000. Ani membeli n buku dan membayar Rp60.000. Nilai n yang memenuhi 15.000 x n = 60.000 adalah ...|4|45|3|5
+0.0.2.0|0|Rumus luas persegi panjang dengan panjang p dan lebar l adalah ...|p x l|2 x (p + l)|p + l|p x p
+0.0.2.0|1|Sebuah persegi panjang berukuran panjang 12 cm dan lebar 7 cm. Keliling persegi panjang itu adalah ...|38 cm|84 cm|19 cm|26 cm
+0.0.2.0|2|Taman berbentuk persegi panjang berukuran 15 m x 10 m. Seluruh taman ditanami rumput dengan biaya Rp8.000 per m2. Biaya seluruhnya adalah ...|Rp1.200.000|Rp400.000|Rp200.000|Rp120.000
+0.0.2.1|0|Pukul 19.00 jika ditulis dengan sistem 12 jam adalah ...|pukul 7 malam|pukul 9 malam|pukul 5 sore|pukul 7 pagi
+0.0.2.1|1|Sebuah pertunjukan dimulai pukul 09.45 dan selesai pukul 11.20. Lama pertunjukan adalah ...|1 jam 35 menit|1 jam 45 menit|2 jam 25 menit|1 jam 25 menit
+0.0.2.1|2|Budi berangkat dari rumah pukul 06.50 dan perjalanan ke sekolah 25 menit. Bel masuk berbunyi pukul 07.30. Budi tiba ... menit sebelum bel berbunyi.|15|40|5|25
+0.0.2.2|0|Sudut yang besarnya tepat 90 derajat disebut sudut ...|siku-siku|lancip|tumpul|lurus
+0.0.2.2|0|Sudut yang besarnya 120 derajat termasuk sudut ...|tumpul|lancip|siku-siku|lurus
+0.0.2.2|1|Pada pukul 03.00, sudut yang dibentuk jarum pendek dan jarum panjang jam adalah ...|90 derajat|30 derajat|60 derajat|180 derajat
+0.0.2.2|2|Pada pukul 04.00, sudut terkecil yang dibentuk jarum pendek dan jarum panjang jam adalah ...|120 derajat|90 derajat|60 derajat|150 derajat
+0.0.3.0|0|Bangun datar yang memiliki tiga sisi disebut ...|segitiga|persegi|trapesium|jajargenjang
+0.0.3.0|0|Banyak sumbu simetri pada bangun persegi adalah ...|4|2|1|8
+0.0.3.0|1|Bangun datar yang keempat sisinya sama panjang, diagonalnya berpotongan tegak lurus, dan sudutnya tidak harus siku-siku adalah ...|belah ketupat|layang-layang|persegi panjang|trapesium
+0.0.3.0|2|Sebuah persegi panjang dipotong sepanjang salah satu diagonalnya. Bentuk dua potongan yang dihasilkan adalah ...|dua segitiga siku-siku|dua segitiga sama sisi|dua persegi|dua trapesium
+0.0.3.1|0|Banyak sisi (bidang) pada bangun ruang kubus adalah ...|6|4|8|12
+0.0.3.1|0|Bangun ruang tabung memiliki alas yang berbentuk ...|lingkaran|persegi|segitiga|persegi panjang
+0.0.3.1|1|Banyak rusuk pada bangun ruang balok adalah ...|12|8|6|10
+0.0.3.1|2|Sebuah kerangka kubus dibuat dari kawat dengan panjang rusuk 6 cm. Panjang kawat yang diperlukan seluruhnya adalah ...|72 cm|36 cm|24 cm|216 cm
+0.0.3.2|0|Pada peta berpetak, titik (3, 2) ditulis (kolom, baris). Letak titik itu adalah ...|3 petak ke kanan dan 2 petak ke atas|2 petak ke kanan dan 3 petak ke atas|3 petak ke kiri dan 2 petak ke bawah|3 petak ke atas dan 3 petak ke kanan
+0.0.3.2|0|Dari titik (1, 1), Rani bergerak 3 petak ke kanan lalu 2 petak ke atas. Rani tiba di titik ...|(4, 3)|(3, 4)|(4, 2)|(3, 2)
+0.0.3.2|1|Pada peta berpetak, perpustakaan berada di (5, 2) dan taman berada di (5, 6). Jarak keduanya adalah ... petak.|4|8|3|5
+0.0.3.2|2|Dari rumah di (2, 2), Ani berjalan 4 petak ke kanan dan 3 petak ke atas, lalu 2 petak ke kiri menuju toko. Toko berada di titik ...|(4, 5)|(6, 5)|(4, 3)|(5, 4)
+0.0.4.0|0|Diagram batang menunjukkan penjualan buah: apel 12 kg, jeruk 8 kg, mangga 15 kg, pisang 10 kg. Buah yang terjual paling banyak adalah ...|mangga|apel|jeruk|pisang
+0.0.4.0|1|Diagram batang menunjukkan penjualan buah: apel 12 kg, jeruk 8 kg, mangga 15 kg, pisang 10 kg. Selisih penjualan mangga dan jeruk adalah ...|7 kg|3 kg|5 kg|27 kg
+0.0.4.0|2|Penjualan buah: apel 12 kg, jeruk 8 kg, mangga 15 kg, pisang 10 kg. Jika semua buah dijual Rp2.000 per kg, hasil penjualannya adalah ...|Rp90.000|Rp45.000|Rp80.000|Rp100.000
+0.0.4.1|0|Tabel nilai ulangan: nilai 6 ada 4 siswa, nilai 7 ada 9 siswa, nilai 8 ada 5 siswa, nilai 9 ada 2 siswa. Banyak siswa seluruhnya adalah ...|20|18|24|9
+0.0.4.1|0|Tabel nilai ulangan: nilai 6 ada 4 siswa, nilai 7 ada 9 siswa, nilai 8 ada 5 siswa, nilai 9 ada 2 siswa. Nilai yang paling banyak diperoleh siswa adalah ...|7|9|8|6
+0.0.4.1|1|Tabel nilai ulangan: nilai 6 ada 4 siswa, nilai 7 ada 9 siswa, nilai 8 ada 5 siswa, nilai 9 ada 2 siswa. Banyak siswa yang mendapat nilai 8 atau lebih adalah ...|7|5|9|2
+0.0.4.1|2|Tabel nilai ulangan: nilai 6 ada 4 siswa, nilai 7 ada 9 siswa, nilai 8 ada 5 siswa, nilai 9 ada 2 siswa. Siswa bernilai 7 lebih banyak daripada gabungan siswa bernilai 6 dan 9 sebanyak ... siswa.|3|5|9|6
+0.0.4.2|0|Pada pelemparan satu dadu bersisi enam, munculnya mata dadu 7 termasuk kejadian ...|mustahil|pasti|mungkin terjadi|sering terjadi
+0.0.4.2|1|Dalam kantong ada 3 kelereng merah dan 5 kelereng biru. Peluang terambilnya kelereng merah adalah ...|3/8|3/5|5/8|1/3
+0.0.4.2|2|Dalam kotak ada 5 bola merah, 7 bola kuning, dan 8 bola hijau. Satu bola diambil secara acak. Peluang terambilnya bola yang bukan hijau adalah ...|3/5|2/5|5/12|3/8
+0.1.0.0|0|Bilangan terkecil di antara -3, -8, 0, dan 5 adalah ...|-8|-3|0|5
+0.1.0.0|0|Hasil dari -5 + 8 adalah ...|3|-3|13|-13
+0.1.0.0|1|Hasil dari (-12) : 4 x (-3) adalah ...|9|-9|-1|1
+0.1.0.0|2|Suhu di puncak gunung -4 derajat Celsius. Suhu turun 7 derajat lalu naik 3 derajat. Suhu akhir adalah ...|-8 derajat Celsius|-14 derajat Celsius|6 derajat Celsius|-6 derajat Celsius
+0.1.0.1|0|Bentuk baku (notasi ilmiah) dari 4.500.000 adalah ...|4,5 × 10⁶|45 × 10⁵|4,5 × 10⁵|4,5 × 10⁷
+0.1.0.1|1|Hasil dari 2³ × 2² dalam bentuk bilangan biasa adalah ...|32|64|10|12
+0.1.0.1|2|Panjang sebuah serangga 0,00032 meter. Dalam notasi ilmiah, panjang itu ditulis ...|3,2 × 10⁻⁴ m|3,2 × 10⁻³ m|3,2 × 10⁴ m|3,2 × 10⁻⁵ m
+0.1.0.2|0|Pada perbandingan senilai, jika satu besaran bertambah maka besaran lainnya ...|bertambah dengan perbandingan yang sama|berkurang|tetap|berkurang dengan perbandingan yang sama
+0.1.0.2|1|Pada peta berskala 1 : 2.000.000, jarak dua kota pada peta 4 cm. Jarak sebenarnya adalah ...|80 km|8 km|800 km|50 km
+0.1.0.2|2|Sebuah pekerjaan diselesaikan oleh 12 pekerja dalam 10 hari. Jika dikerjakan 8 pekerja dengan kemampuan sama, pekerjaan selesai dalam ...|15 hari|7 hari|12 hari|20 hari
+0.1.0.3|0|Imbalan yang diberikan bank kepada nasabah atas uang yang disimpan disebut ...|bunga|inflasi|diskon|laba
+0.1.0.3|1|Sebuah tas harganya Rp240.000 dan mendapat diskon 25 persen. Harga yang harus dibayar adalah ...|Rp180.000|Rp60.000|Rp215.000|Rp225.000
+0.1.0.3|2|Sari menabung Rp2.000.000 dengan bunga tunggal 6 persen per tahun. Bunga yang diperoleh setelah 9 bulan adalah ...|Rp90.000|Rp120.000|Rp810.000|Rp1.080.000
+0.1.1.0|0|Koefisien x pada bentuk aljabar 5x - 3y + 7 adalah ...|5|-3|7|0
+0.1.1.0|0|Suku yang sejenis dengan 3xy adalah ...|-7xy|3x|3y|3x²y
+0.1.1.0|1|Bentuk paling sederhana dari 3x + 5 - x + 2 adalah ...|2x + 7|4x + 7|2x + 3|4x + 3
+0.1.1.0|2|Sebuah persegi panjang berpanjang (2x + 3) cm dan berlebar x cm. Keliling persegi panjang tersebut adalah ...|(6x + 6) cm|(3x + 3) cm|(2x² + 3x) cm|(6x + 3) cm
+0.1.1.1|0|Nilai x yang memenuhi x - 4 = 9 adalah ...|13|5|-5|36
+0.1.1.1|1|Penyelesaian dari persamaan 3x + 5 = 20 adalah x = ...|5|15|25/3|-5
+0.1.1.1|2|Tarif taksi Rp8.000 untuk buka pintu ditambah Rp3.000 per km. Jika Rani membayar Rp38.000, jarak perjalanannya adalah ...|10 km|12 km|15 km|8 km
+0.1.1.2|0|Fungsi adalah relasi yang setiap anggota daerah asalnya dipasangkan dengan ...|tepat satu anggota daerah kawan|lebih dari satu anggota daerah kawan|paling sedikit dua anggota daerah kawan|tidak ada anggota daerah kawan
+0.1.1.2|0|Diketahui f(x) = 2x + 1. Nilai f(3) adalah ...|7|5|9|8
+0.1.1.2|1|Fungsi f(x) = x² - 1 dengan daerah asal {-1, 0, 2}. Daerah hasil fungsi tersebut adalah ...|{-1, 0, 3}|{0, 1, 3}|{-1, 0, 4}|{-2, -1, 3}
+0.1.1.2|2|Fungsi f(x) = ax + b dengan f(1) = 5 dan f(2) = 8. Nilai f(5) adalah ...|17|15|14|20
+0.1.1.3|0|Metode yang dapat digunakan untuk menyelesaikan sistem persamaan linear dua variabel adalah ...|substitusi|integral|diferensial|pembagian bersusun
+0.1.1.3|1|Diketahui x + y = 7 dan x - y = 3. Nilai x adalah ...|5|4|2|3
+0.1.1.3|2|Harga 2 kg apel dan 1 kg jeruk Rp70.000, sedangkan 1 kg apel dan 1 kg jeruk Rp45.000. Harga 3 kg apel dan 2 kg jeruk adalah ...|Rp115.000|Rp100.000|Rp125.000|Rp110.000
+0.1.2.0|0|Garis lurus yang melalui titik pusat dan menghubungkan dua titik pada lingkaran disebut ...|diameter|jari-jari|tali busur|apotema
+0.1.2.0|1|Sebuah lingkaran berdiameter 14 cm. Dengan π = 22/7, kelilingnya adalah ...|44 cm|22 cm|88 cm|154 cm
+0.1.2.0|2|Roda sepeda berjari-jari 35 cm berputar sebanyak 100 kali. Dengan π = 22/7, jarak yang ditempuh adalah ...|220 m|22 m|440 m|110 m
+0.1.2.1|0|Banyak sisi pada prisma segitiga adalah ...|5|6|4|3
+0.1.2.1|1|Luas permukaan kubus dengan panjang rusuk 8 cm adalah ...|384 cm²|512 cm²|256 cm²|192 cm²
+0.1.2.1|2|Sebuah kaleng berbentuk tabung tertutup berjari-jari 7 cm dan tinggi 10 cm. Dengan π = 22/7, luas permukaannya adalah ...|748 cm²|440 cm²|308 cm²|1.496 cm²
+0.1.2.2|0|Rumus volume kubus dengan panjang rusuk s adalah ...|s × s × s|6 × s × s|4 × s|3 × s
+0.1.2.2|1|Volume balok berukuran 10 cm x 6 cm x 5 cm adalah ...|300 cm³|21 cm³|600 cm³|150 cm³
+0.1.2.2|2|Bak mandi berbentuk balok berukuran 100 cm x 60 cm x 50 cm terisi penuh. Setelah dipakai 120 liter, sisa air adalah ... liter. (1 liter = 1.000 cm³)|180|120|240|300
+0.1.3.0|0|Dua sudut yang saling berpelurus memiliki jumlah ...|180 derajat|90 derajat|360 derajat|270 derajat
+0.1.3.0|0|Dua sudut saling berpenyiku. Jika salah satu sudut 35 derajat, sudut lainnya adalah ...|55 derajat|145 derajat|35 derajat|65 derajat
+0.1.3.0|1|Dua garis sejajar dipotong oleh sebuah garis lain. Jika sebuah sudut 70 derajat, sudut sehadannya yang bersesuaian besarnya ...|70 derajat|110 derajat|20 derajat|290 derajat
+0.1.3.0|2|Dua sudut dalam sebuah segitiga adalah 50 derajat dan 70 derajat. Besar sudut luar pada sudut ketiga adalah ...|120 derajat|60 derajat|130 derajat|110 derajat
+0.1.3.1|0|Dua lingkaran selalu bersifat ...|sebangun|kongruen|berpotongan|sejajar
+0.1.3.1|0|Dua bangun datar sebangun jika sudut-sudut yang bersesuaian ... dan sisi-sisi yang bersesuaian ...|sama besar dan sebanding|sama besar dan sama panjang|berbeda dan sebanding|berbeda dan sama panjang
+0.1.3.1|1|Segitiga ABC sebangun dengan segitiga PQR. Diketahui AB = 6 cm, PQ = 9 cm, dan BC = 8 cm. Panjang QR adalah ...|12 cm|10 cm|14 cm|5,3 cm
+0.1.3.1|2|Tiang setinggi 2 m berbayang 3 m. Pada saat yang sama, sebuah pohon berbayang 12 m. Tinggi pohon tersebut adalah ...|8 m|18 m|6 m|10 m
+0.1.3.2|1|Sebuah tangga 13 m disandarkan pada dinding dengan kaki tangga 5 m dari dinding. Tinggi ujung tangga dari tanah adalah ...|12 m|8 m|18 m|10 m
+0.1.3.2|2|Anto berlari menyusuri diagonal lapangan persegi panjang berukuran 24 m x 7 m. Jarak yang ditempuh Anto adalah ...|25 m|31 m|17 m|27 m
+0.1.3.3|0|Titik (3, 2) dicerminkan terhadap sumbu-y. Bayangannya adalah ...|(-3, 2)|(3, -2)|(-3, -2)|(2, 3)
+0.1.3.3|0|Titik (1, 4) ditranslasikan oleh (2, -3). Bayangannya adalah ...|(3, 1)|(-1, 7)|(3, 7)|(-1, 1)
+0.1.3.3|1|Titik (2, 1) dirotasikan 90 derajat berlawanan arah jarum jam dengan pusat O(0, 0). Bayangannya adalah ...|(-1, 2)|(1, -2)|(-2, -1)|(1, 2)
+0.1.3.3|2|Segitiga yang luasnya 6 cm² didilatasi dengan faktor skala 2. Luas bayangannya adalah ...|24 cm²|12 cm²|18 cm²|36 cm²
+0.1.4.0|0|Modus dari data 4, 7, 5, 7, 9, 7, 3 adalah ...|7|5|6|9
+0.1.4.0|1|Rata-rata dari data 5, 6, 6, 8, 10 adalah ...|7|6|8|35
+0.1.4.0|2|Rata-rata nilai 5 siswa adalah 80. Setelah seorang siswa baru bergabung, rata-ratanya menjadi 82. Nilai siswa baru adalah ...|92|90|82|88
+0.1.4.1|0|Diagram yang paling tepat untuk menunjukkan perubahan data dari waktu ke waktu adalah diagram ...|garis|lingkaran|pohon|venn
+0.1.4.1|0|Pada diagram lingkaran, sudut pusat untuk bagian 25 persen adalah ...|90 derajat|25 derajat|45 derajat|75 derajat
+0.1.4.1|1|Dari 120 siswa, 40 persen menyukai sepak bola. Banyak siswa yang menyukai sepak bola adalah ...|48 siswa|40 siswa|30 siswa|80 siswa
+0.1.4.1|2|Pada diagram lingkaran data 200 orang, sebuah bagian memiliki sudut pusat 72 derajat. Banyak orang pada bagian itu adalah ...|40 orang|72 orang|20 orang|36 orang
+0.1.4.2|0|Nilai peluang suatu kejadian yang pasti terjadi adalah ...|1|0|0,5|10
+0.1.4.2|1|Sebuah dadu dilempar satu kali. Peluang muncul mata dadu prima adalah ...|1/2|1/3|2/3|1/6
+0.1.4.2|2|Dua dadu dilempar bersamaan. Peluang jumlah kedua mata dadu sama dengan 8 adalah ...|5/36|1/6|1/9|7/36
+0.2.0.0|0|Bentuk sederhana dari a⁵ × a³ adalah ...|a⁸|a¹⁵|a²|2a⁸
+0.2.0.0|1|Nilai dari (2³)² adalah ...|64|32|36|12
+0.2.0.0|2|Nilai dari 27^(2/3) + 16^(1/4) adalah ...|11|13|8|18
+0.2.0.1|0|Barisan aritmetika adalah barisan yang memiliki ...|selisih tetap antara dua suku berurutan|rasio tetap antara dua suku berurutan|jumlah tetap antara dua suku berurutan|selisih yang selalu bertambah
+0.2.0.1|2|Deret aritmetika 3 + 7 + 11 + ... Jumlah 10 suku pertama deret tersebut adalah ...|210|200|190|220
+0.2.0.2|0|Pada bunga majemuk, bunga setiap periode dihitung dari ...|modal awal ditambah bunga periode sebelumnya|modal awal saja|bunga periode sebelumnya saja|jumlah periode saja
+0.2.0.2|1|Modal Rp1.000.000 dibungakan majemuk 10 persen per tahun. Setelah 2 tahun, jumlah uangnya adalah ...|Rp1.210.000|Rp1.200.000|Rp1.100.000|Rp1.220.000
+0.2.0.2|2|Modal Rp5.000.000 dengan bunga 8 persen per tahun selama 2 tahun. Selisih bunga majemuk dan bunga tunggal adalah ...|Rp32.000|Rp16.000|Rp64.000|Rp82.000
+0.2.1.0|0|Jika kedua ruas pertidaksamaan dikalikan bilangan negatif, maka tanda ketidaksamaan ...|dibalik|tetap|menjadi sama dengan|dihilangkan
+0.2.1.0|1|Penyelesaian dari 2x - 5 ≤ 9 adalah ...|x ≤ 7|x ≥ 7|x ≤ 2|x ≤ 14
+0.2.1.1|0|Grafik fungsi f(x) = -2x² + 3x + 1 terbuka ke ...|bawah|atas|kanan|kiri
+0.2.1.1|1|Titik puncak grafik y = x² - 4x + 3 adalah ...|(2, -1)|(-2, -1)|(2, 1)|(4, 3)
+0.2.1.1|2|Nilai maksimum fungsi f(x) = -x² + 6x - 5 adalah ...|4|3|9|-5
+0.2.1.2|0|Jika f(x) = 2^x, maka nilai f(3) adalah ...|8|6|9|5
+0.2.1.2|1|Penyelesaian persamaan 3^(x+1) = 81 adalah x = ...|3|4|2|27
+0.2.1.2|2|Sebuah bakteri berjumlah 100 dan jumlahnya berlipat dua setiap jam. Setelah 5 jam, jumlah bakteri adalah ...|3.200|500|1.000|6.400
+0.2.1.3|0|Invers dari fungsi f(x) = 2x + 1 adalah f⁻¹(x) = ...|(x - 1)/2|(x + 1)/2|2x - 1|1/(2x + 1)
+0.2.1.3|1|Diketahui f(x) = x + 2 dan g(x) = 3x. Nilai (f ∘ g)(2) adalah ...|8|12|10|6
+0.2.1.3|2|Diketahui f(x) = 3x + 4 dan (f ∘ g)(x) = 6x - 5. Fungsi g(x) adalah ...|2x - 3|2x + 3|3x - 3|2x - 1
+0.2.2.0|0|Nilai sin 30 derajat adalah ...|1/2|√3/2|1|√2/2
+0.2.2.0|1|Pada segitiga siku-siku dengan sisi 3, 4, dan 5, sudut A berhadapan dengan sisi 3. Nilai cos A adalah ...|4/5|3/5|3/4|5/4
+0.2.2.0|2|Seorang anak setinggi mata 1,6 m berdiri 15 m dari sebuah tiang. Sudut elevasi puncak tiang 45 derajat. Tinggi tiang adalah ...|16,6 m|15 m|13,4 m|31,6 m
+0.2.2.1|0|Persamaan lingkaran berpusat di (0, 0) dengan jari-jari r adalah ...|x² + y² = r²|x² - y² = r²|x + y = r|x² + y² = r
+0.2.2.1|0|Lingkaran (x - 3)² + (y + 2)² = 25 memiliki pusat dan jari-jari ...|(3, -2) dan 5|(-3, 2) dan 5|(3, -2) dan 25|(-3, 2) dan 25
+0.2.2.1|1|Lingkaran berpusat di (1, 2) dan melalui titik (4, 6). Jari-jari lingkaran tersebut adalah ...|5|7|25|3
+0.2.2.1|2|Persamaan garis singgung lingkaran x² + y² = 25 di titik (3, 4) adalah ...|3x + 4y = 25|4x + 3y = 25|3x + 4y = 5|3x - 4y = 25
+0.2.3.0|0|Nilai tengah dari data yang sudah diurutkan disebut ...|median|modus|mean|jangkauan
+0.2.3.0|1|Jangkauan dari data 12, 5, 9, 20, 7 adalah ...|15|8|20|13
+0.2.3.0|2|Kelas A (20 siswa) rata-ratanya 70 dan kelas B (30 siswa) rata-ratanya 80. Rata-rata gabungan kedua kelas adalah ...|76|75|74|78
+0.2.3.1|0|Diagram pencar digunakan untuk melihat hubungan antara ...|dua variabel numerik|satu variabel kategori|tiga variabel kategori|proporsi satu variabel
+0.2.3.1|0|Titik-titik pada diagram pencar menyebar dari kiri bawah ke kanan atas. Korelasi kedua variabel adalah ...|positif|negatif|nol|tidak dapat ditentukan
+0.2.3.1|1|Semakin tinggi kecepatan kendaraan, semakin singkat waktu tempuh pada jarak tetap. Korelasi kedua variabel adalah ...|negatif|positif|nol|sempurna positif
+0.2.3.1|2|Garis kecenderungan hubungan jam belajar x dan nilai y adalah y = 3x + 20. Prediksi nilai untuk 8 jam belajar adalah ...|44|36|52|24
+0.2.3.2|0|Jika A dan B kejadian saling lepas, maka P(A ∪ B) = ...|P(A) + P(B)|P(A) × P(B)|P(A) - P(B)|P(A) / P(B)
+0.2.3.2|1|Dua koin dilempar bersamaan. Peluang muncul dua angka adalah ...|1/4|1/2|1/3|3/4
+0.2.3.2|2|Kotak berisi 5 bola merah dan 3 bola putih. Dua bola diambil berurutan tanpa pengembalian. Peluang keduanya merah adalah ...|5/14|25/64|5/8|5/7
+0.2.3.3|0|Nilai dari 5! adalah ...|120|25|60|720
+0.2.3.3|1|Banyak susunan berbeda dari huruf-huruf pada kata BUKU adalah ...|12|24|6|8
+0.2.3.3|2|Dari 7 siswa dipilih 3 untuk tim lomba, dan dari 4 guru dipilih 1 sebagai pendamping. Banyak cara pemilihan adalah ...|140|210|35|420
+1.0.0.0|0|Ibu guru berkata, "Besok kita berkunjung ke kebun binatang pukul 08.00." Kapan kita berkunjung?|Besok pukul 08.00|Hari ini pukul 08.00|Besok pukul 10.00|Lusa pukul 08.00
+1.0.0.0|0|Pak Rudi mengumumkan, "Lomba kebersihan kelas diadakan hari Jumat." Apa yang diumumkan?|Lomba kebersihan kelas|Lomba menyanyi|Lomba menggambar|Lomba lari pagi
+1.0.0.0|1|Dina mendengar berita, "Banjir merendam sawah di desa itu sehingga petani gagal panen." Mengapa petani gagal panen?|Sawah terendam banjir|Sawah terserang hama|Hujan tidak turun|Harga padi turun
+1.0.0.1|0|Cerita rakyat yang disampaikan secara lisan secara turun-temurun disebut...|dongeng|surat|berita|iklan
+1.0.0.1|0|Pantun terdiri atas empat baris. Dua baris pertama pantun disebut...|sampiran|isi|judul|penutup
+1.0.0.1|1|Si Kancil mencuri timun, tetapi akhirnya tertangkap Pak Tani. Pesan cerita itu adalah...|perbuatan buruk ada akibatnya|mencuri itu membuat kaya|petani harus pemarah|kancil suka timun
+1.0.1.0|0|Ide pokok paragraf adalah...|gagasan utama dalam paragraf|judul sebuah buku|jumlah kalimat paragraf|kalimat yang paling panjang
+1.0.1.0|0|Ayam bermanfaat bagi manusia. Dagingnya dimakan. Telurnya bergizi. Bulunya menjadi hiasan. Ide pokok paragraf itu adalah...|manfaat ayam bagi manusia|cara memelihara ayam|jenis-jenis ayam|kandang ayam
+1.0.1.2|0|Sinonim kata "pandai" adalah...|pintar|malas|nakal|lemah
+1.0.2.0|0|Hal yang sebaiknya dilakukan sebelum presentasi di depan kelas adalah...|berlatih terlebih dahulu|bermain di luar kelas|tidur sepanjang hari|tidak membawa bahan
+1.0.2.0|0|Saat presentasi, suara kita sebaiknya...|jelas dan terdengar semua teman|berbisik pelan sekali|sangat cepat dan tidak jelas|tertutup oleh tangan
+1.0.2.0|1|Rina mempresentasikan hewan langka sambil menunduk dan bersuara pelan. Saran yang tepat untuknya adalah...|menatap teman dan menguatkan suara|terus menunduk saja|membaca lebih cepat|berhenti berbicara
+1.0.2.0|2|Budi membaca teks panjang di kertas tanpa menatap teman, sehingga teman bosan. Perbaikan yang paling tepat adalah...|memakai poin penting dan gambar|menambah isi teks lagi|membaca lebih cepat|memperkecil suara
+1.0.2.1|0|Pelaku dalam sebuah cerita disebut...|tokoh|latar|judul|amanat
+1.0.2.1|0|Agar cerita menarik saat didengar, kita perlu menggunakan...|intonasi dan ekspresi yang sesuai|suara yang datar saja|wajah murung terus|bisikan yang lirih
+1.0.2.1|2|Ani bercerita runtut dari awal sampai akhir, sedangkan Beni bercerita meloncat-loncat. Cerita yang lebih mudah dipahami adalah...|cerita Ani karena urutannya jelas|cerita Beni karena lebih cepat|cerita Beni karena lebih lucu|keduanya sama mudahnya
+1.0.3.0|0|Kalimat tanya diakhiri dengan tanda...|tanda tanya (?)|titik (.)|tanda seru (!)|koma (,)
+1.0.3.0|2|Kalimat yang tersusun benar dan bermakna adalah...|Kakak menulis surat.|Surat menulis kakak.|Menulis surat kakak.|Kakak surat menulis.
+1.0.3.1|2|Kalimat yang penulisan huruf kapitalnya benar adalah...|Kami berlibur ke Bali pada hari Minggu.|kami berlibur ke bali pada hari minggu.|Kami berlibur ke bali pada hari Minggu.|Kami berlibur ke Bali pada hari minggu.
+1.0.3.2|0|Lawan kata "tinggi" adalah...|rendah|luas|jauh|panjang
+1.0.3.2|0|Persamaan kata (sinonim) "indah" adalah...|cantik|buruk|kotor|rusak
+1.0.3.2|1|Kata "kepala" pada kalimat "Kepala sekolah memimpin upacara." bermakna...|pemimpin|bagian tubuh|ujung jalan|bagian atas
+1.0.3.2|2|Kalimat "Adik panjang tangan, uang temannya hilang." Makna "panjang tangan" adalah...|suka mencuri|berlengan panjang|suka membantu|rajin menulis
+1.0.3.3|0|Karangan yang menceritakan suatu peristiwa secara berurutan disebut karangan...|narasi|deskripsi|argumentasi|persuasi
+1.0.3.3|0|Judul karangan sebaiknya...|singkat dan sesuai dengan isi|panjang dan tidak berkaitan|dikosongkan saja|berupa daftar nama
+1.0.3.3|1|Kalimat pembuka yang paling cocok untuk karangan berjudul "Liburan ke Pantai" adalah...|Minggu lalu, aku berlibur ke pantai bersama keluarga.|Sekian dan terima kasih atas perhatiannya.|Pantai adalah tempat menanam padi.|Daftar belanja ibu sangat panjang.
+1.1.0.0|0|Pembicara berkata, "Sampah plastik mencemari laut dan ditelan hewan laut. Karena itu, kurangi kantong plastik." Gagasan utamanya adalah...|perlunya mengurangi penggunaan kantong plastik|hewan laut suka makan plastik|laut adalah tempat wisata|plastik dibuat dari minyak bumi
+1.1.0.0|0|Gagasan pokok dalam teks lisan adalah...|hal utama yang disampaikan pembicara|cara pembicara berpakaian|jumlah pendengar yang hadir|lama waktu berbicara
+1.1.0.0|2|Pembicara berkata, "Kantin sehat membuat semua siswa lebih pintar," tanpa data apa pun. Penilaian yang tepat adalah...|gagasan belum didukung bukti yang memadai|gagasan pasti benar karena meyakinkan|gagasan salah karena kantin tidak penting|gagasan tidak perlu dinilai
+1.1.0.1|0|Unsur yang berkaitan dengan tempat, waktu, dan suasana dalam cerita disebut...|latar|tema|amanat|tokoh
+1.1.0.1|0|Pesan moral yang ingin disampaikan pengarang kepada pembaca disebut...|amanat|alur|latar|sudut pandang
+1.1.0.1|1|Dalam legenda Malin Kundang, Malin malu mengakui ibunya yang renta lalu mengusirnya. Watak Malin adalah...|durhaka dan tidak tahu berterima kasih|rendah hati dan penyayang|sabar dan bijaksana|jujur dan dermawan
+1.1.1.1|0|Pendapat pro adalah pendapat yang...|mendukung suatu gagasan|menolak suatu gagasan|tidak berpihak sama sekali|belum memiliki alasan
+1.1.1.1|1|"Saya menolak larangan membawa ponsel karena ponsel membantu kami belajar." Pendapat itu bersifat...|kontra terhadap larangan ponsel|pro terhadap larangan ponsel|netral terhadap larangan ponsel|tidak memiliki alasan
+1.1.1.2|0|Ciri sumber informasi yang kredibel adalah...|ditulis ahli dan dapat dicek kebenarannya|tidak mencantumkan penulis|memakai judul yang berlebihan|hanya berisi pendapat pribadi
+1.1.2.0|0|Kata yang lazim menandai kalimat usul adalah...|sebaiknya|meskipun|sebab|akibatnya
+1.1.2.0|0|Pemecahan atas suatu masalah disebut...|solusi|akibat|latar|pertanyaan
+1.1.2.0|1|Sungai dekat sekolah penuh sampah. Solusi yang paling tepat adalah...|membuat jadwal piket dan menyediakan tempat sampah|membiarkan sampah hanyut sendiri|memindahkan sekolah ke tempat lain|menutup sungai dengan papan
+1.1.2.1|0|Teks multimodal adalah teks yang...|memadukan beberapa mode, misalnya tulisan dan gambar|hanya berisi tulisan tanpa gambar|hanya berupa suara tanpa tulisan|ditulis dalam beberapa bahasa
+1.1.2.1|0|Contoh teks multimodal adalah...|poster dengan gambar dan tulisan|novel tanpa ilustrasi|surat tulisan tangan polos|daftar nama polos
+1.1.2.1|1|Poster menampilkan tiga tong sampah berwarna beda dengan tulisan "Pilah sampahmu". Fungsi gambar pada poster itu adalah...|memperjelas pesan yang disampaikan|sekadar mengisi ruang kosong|menggantikan seluruh tulisan|mengalihkan perhatian pembaca
+1.1.2.1|2|Infografik berjudul "Konsumsi air turun 50%", tetapi grafik batangnya menunjukkan penurunan 15%. Penilaian yang tepat adalah...|judul tidak sesuai data sehingga menyesatkan|judul benar karena lebih menarik|grafik salah karena judul lebih penting|keduanya sudah sesuai
+1.1.3.0|0|Teks yang berisi langkah-langkah berurutan untuk membuat sesuatu disebut teks...|prosedur|narasi|persuasi|deskripsi
+1.1.3.0|2|"Sebaiknya pemerintah menambah taman kota karena taman menyehatkan warga. Mari kita dukung bersama!" Teks itu bertujuan...|mengajak pembaca melakukan sesuatu|menceritakan pengalaman pribadi|menjelaskan urutan langkah kerja|melaporkan hasil pengamatan
+1.1.3.2|1|"Dia anak emas guru matematika." Makna "anak emas" pada kalimat itu adalah...|anak kesayangan|anak berkulit emas|anak yang kaya raya|anak yang nakal
+1.1.3.2|2|"Kasus penipuan itu akhirnya dibawa ke meja hijau." Makna "meja hijau" adalah...|pengadilan|meja berwarna hijau|kantor kepala desa|ruang rapat sekolah
+1.2.0.0|0|Mengevaluasi teks lisan berarti...|menilai isi, struktur, dan kebahasaan teks yang disimak|menghafal seluruh isi teks|menyalin teks tanpa perubahan|mengulang teks dengan nada sama
+1.2.0.0|0|Gerak tubuh dan ekspresi wajah pembicara termasuk aspek...|nonverbal|ejaan|diksi|paragraf
+1.2.0.0|2|Seorang penceramah berkata, "Semua remaja malas belajar," tanpa data. Evaluasi yang tepat adalah...|pernyataan itu generalisasi tanpa bukti|pernyataan itu pasti benar|pernyataan itu data yang kuat|pernyataan itu tidak perlu dinilai
+1.2.0.1|0|Contoh sastra lisan di Indonesia adalah...|mantra|novel modern|cerpen koran|esai ilmiah
+1.2.0.1|0|Ciri utama sastra lisan adalah...|disebarkan secara lisan dan turun-temurun|dicetak dalam bentuk buku|penulisnya selalu terkenal|hanya dibaca dalam hati
+1.2.0.1|1|Pantun: "Kalau ada sumur di ladang / boleh kita menumpang mandi / kalau ada umur panjang / boleh kita berjumpa lagi." Pesan pantun itu adalah...|harapan untuk bertemu kembali|ajakan membangun sumur|larangan mandi di ladang|anjuran berladang bersama
+1.2.0.1|2|Penutur tradisi lisan di sebuah daerah semakin berkurang. Langkah apresiasi yang paling tepat adalah...|mendokumentasikan dan mementaskannya di berbagai media|membiarkannya hilang secara alami|melarang anak muda mempelajarinya|menggantinya dengan karya asing
+1.2.1.1|0|Hoaks adalah...|informasi bohong yang dibuat seolah-olah benar|berita resmi dari lembaga terpercaya|hasil penelitian yang teruji|laporan pengamatan langsung
+1.2.1.1|1|Pesan berantai: "Minum air garam menghilangkan virus, sebarkan sebelum dihapus!" Ciri tidak kredibel pesan itu adalah...|tanpa sumber jelas dan memaksa disebarkan|disertai nama peneliti dan jurnal|menyertakan data yang terbuka|ditulis dengan bahasa baku
+1.2.1.2|0|Membandingkan dua teks berarti mencari...|persamaan dan perbedaannya|hanya kesalahan ejaannya|jumlah halamannya saja|nama penulisnya saja
+1.2.1.2|0|Aspek yang dapat dibandingkan dari dua teks berita adalah...|sudut pandang, pilihan kata, dan data|warna kertas dan ukuran huruf|harga koran dan tempat cetak|jumlah iklan di halaman lain
+1.2.1.2|1|Berita A: "Demo ricuh, puluhan orang terluka." Berita B: "Aksi berlangsung dinamis, beberapa peserta dirawat." Perbedaan keduanya terletak pada...|pilihan kata dan tingkat penekanan|jumlah halaman berita|warna foto berita|nama koran pemuat
+1.2.2.0|0|Sistematika presentasi yang lazim adalah...|pembukaan, isi, penutup|penutup, isi, pembukaan|isi, penutup, salam|salam, penutup, isi
+1.2.2.0|0|Slide presentasi yang baik sebaiknya berisi...|poin ringkas dan visual pendukung|paragraf panjang yang padat|seluruh naskah pidato|huruf sangat kecil
+1.2.2.0|1|Saat presentasi, audiens bertanya hal yang belum Anda ketahui. Sikap yang tepat adalah...|jujur dan berjanji mencari jawabannya|mengarang jawaban agar tampak pintar|mengabaikan pertanyaan itu|menyalahkan penanya
+1.2.2.0|2|Seorang penyaji membacakan slide berisi paragraf panjang kata demi kata. Evaluasi yang tepat adalah...|tidak efektif, sebaiknya diringkas menjadi poin dan visual|sudah efektif karena lengkap|efektif karena audiens membaca bersama|sudah baik asalkan dibaca cepat
+1.2.2.1|0|Pernyataan yang diajukan untuk dibuktikan dalam argumentasi disebut...|klaim|latar|ilustrasi|penutup
+1.2.2.1|1|"Sekolah perlu menambah jam olahraga karena penelitian menunjukkan aktivitas fisik meningkatkan konsentrasi." Bagian setelah "karena" berfungsi sebagai...|alasan atau bukti pendukung|klaim utama|kesimpulan akhir|pembuka teks
+1.2.2.2|0|Orang yang memimpin dan mengatur jalannya debat disebut...|moderator|notulis|juri|penyanggah
+1.2.2.2|0|Tim yang mendukung mosi dalam debat disebut tim...|afirmatif|oposisi|netral|moderator
+1.2.2.2|1|"Data Anda hanya dari satu kota, sehingga belum mewakili seluruh negeri." Pernyataan itu termasuk...|sanggahan|pembukaan|kesimpulan|pengantar mosi
+1.2.3.1|0|Kalimat efektif adalah kalimat yang...|menyampaikan gagasan dengan tepat dan mudah dipahami|selalu sangat panjang|memakai banyak kata asing|berisi kata yang diulang-ulang
+1.2.3.1|1|Kalimat yang efektif adalah...|Mereka saling membantu.|Mereka sama-sama saling membantu.|Mereka saling membantu satu sama lain.|Mereka saling bantu-membantu.
+1.2.3.2|0|Bentuk baku yang benar adalah...|apotek|apotik|afotek|apothek
+1.2.3.2|2|Perbaikan yang tepat untuk "Pemerintah merubah kebijakan itu." adalah...|Pemerintah mengubah kebijakan itu.|Pemerintah merobah kebijakan itu.|Pemerintah memperubah kebijakan itu.|Pemerintah merubahkan kebijakan itu.
+1.2.3.3|0|Media cetak yang lazim untuk mempublikasikan cerpen adalah...|majalah atau surat kabar|buku telepon|kamus bahasa|daftar harga
+1.2.3.3|0|Proses memeriksa dan memperbaiki naskah sebelum terbit disebut...|penyuntingan|pengarsipan|penjilidan|pendistribusian
+1.2.3.3|1|Seorang penulis akan mengirim cerpen ke redaksi koran. Hal yang harus diperhatikan adalah...|ketentuan redaksi, seperti jumlah kata dan format|warna sampul naskah semata|harga koran pada hari itu|jumlah pembaca di rumahnya
+1.2.3.3|2|Penulis mengunggah puisinya di media sosial dan memuat larik karya orang lain tanpa keterangan. Tindakan etis yang tepat adalah...|mencantumkan sumber atau meminta izin|membiarkannya karena tidak ketahuan|menghapus nama pemilik karya|mengklaim seluruhnya sebagai miliknya
+2.0.0.0|0|Wujud zat yang bentuk dan volumenya tetap adalah...|padat|cair|gas|uap
+2.0.0.0|1|Es batu di dalam gelas lama-lama menjadi air. Peristiwa ini disebut...|mencair|membeku|menguap|mengembun
+2.0.0.0|2|Air di piring lebar lebih cepat berkurang daripada air di gelas di bawah matahari. Penyebabnya...|permukaan piring lebih luas sehingga penguapan lebih cepat|piring lebih berat daripada gelas|air di gelas berubah menjadi es|air di piring meresap ke dalam piring
+2.0.1.0|0|Tulang pada tubuh manusia berfungsi untuk...|menopang dan melindungi tubuh|mencerna makanan|memompa darah|menyaring udara
+2.0.1.0|2|Setelah berlari, detak jantung Budi lebih cepat daripada saat duduk. Penjelasan yang tepat adalah...|otot butuh lebih banyak oksigen sehingga darah dipompa lebih cepat|jantung rusak karena lelah|paru-paru berhenti bekerja|darah berhenti mengalir ke otot
+2.0.1.2|0|Hewan yang hanya memakan tumbuhan disebut...|herbivora|karnivora|omnivora|insektivora
+2.0.1.2|2|Hewan A bergigi runcing dan tajam, hewan B bergigi datar dan lebar. Kesimpulan yang tepat...|A pemakan daging dan B pemakan tumbuhan|A pemakan tumbuhan dan B pemakan daging|keduanya pemakan tumbuhan|keduanya pemakan daging
+2.0.1.3|0|Gas yang dihasilkan tumbuhan dan dihirup manusia adalah...|oksigen|karbon dioksida|nitrogen|metana
+2.0.1.3|1|Membuang sampah ke sungai dapat menyebabkan...|air tercemar dan ikan mati|air makin jernih|ikan makin banyak|banjir tidak pernah terjadi
+2.0.1.3|1|Sisa sayur dan daun kering sebaiknya dimanfaatkan menjadi...|kompos|racun|plastik|logam
+2.0.2.0|0|Gaya yang menarik benda jatuh ke bumi disebut gaya...|gravitasi|magnet|gesek|pegas
+2.0.2.0|2|Dua anak mendorong lemari dari arah berlawanan. Dorongan A lebih besar daripada B. Lemari akan bergerak...|ke arah A, karena gaya A lebih besar|ke arah B, karena gaya B lebih kecil|tidak bergerak, karena gaya selalu sama|ke atas, karena didorong dua anak
+2.0.2.1|0|Sumber energi utama bagi bumi adalah...|matahari|bulan|angin|batu bara
+2.0.2.1|1|Lampu pijar mengubah energi listrik menjadi cahaya dan...|panas|gerak|bunyi|energi kimia
+2.0.2.1|2|Pada terang yang sama, lampu LED lebih hemat daripada lampu pijar karena...|lebih sedikit energi berubah menjadi panas|tidak memakai energi listrik|menghasilkan lebih banyak panas|cahayanya tidak berasal dari energi
+2.0.3.0|0|Planet yang paling dekat dengan Matahari adalah...|Merkurius|Venus|Bumi|Mars
+2.0.3.0|1|Rotasi Bumi menyebabkan terjadinya...|pergantian siang dan malam|pergantian musim|gerhana Bulan|gempa bumi
+2.0.3.0|2|Saat Indonesia mengalami siang hari, wilayah di sisi Bumi yang berlawanan mengalami...|malam hari|siang hari juga|gerhana|musim dingin saja
+2.0.3.1|0|Matahari termasuk benda langit yang disebut...|bintang|planet|satelit|komet
+2.0.3.1|1|Bayangan benda paling pendek terjadi ketika Matahari berada...|tepat di atas kepala pada tengah hari|di ufuk timur|di ufuk barat|di bawah cakrawala
+2.0.3.1|2|Baju A dijemur di terik matahari dan baju B di tempat teduh. Baju A lebih cepat kering karena...|panas Matahari mempercepat penguapan air|baju A lebih ringan|air hilang ke tanah|cahaya menyerap air dari baju
+2.1.0.0|1|Enzim amilase di dalam mulut mengubah amilum menjadi...|maltosa|asam amino|asam lemak|gliserol
+2.1.0.1|0|Contoh campuran homogen adalah...|larutan gula dalam air|air dan minyak|pasir dan air|tanah liat dan air
+2.1.0.1|1|Contoh perubahan fisika adalah...|kapur barus menyublim|besi berkarat|susu menjadi basi|kayu terbakar
+2.1.0.1|2|Pita magnesium dibakar dan menghasilkan serbuk putih. Bukti perubahan kimia adalah...|terbentuk zat baru dengan sifat berbeda|wujud zat tetap padat|ukuran pita menjadi lebih kecil|pita menjadi lebih panas saja
+2.1.0.2|0|Gas rumah kaca utama hasil pembakaran bahan bakar fosil adalah...|karbon dioksida|oksigen|nitrogen|helium
+2.1.0.4|0|Perpindahan kalor tanpa zat perantara disebut...|radiasi|konduksi|konveksi|evaporasi
+2.1.0.4|1|Sendok logam dalam teh panas ikut panas karena kalor berpindah secara...|konduksi|konveksi|radiasi|sublimasi
+2.1.0.5|0|Kutub senama dari dua magnet jika didekatkan akan...|tolak-menolak|tarik-menarik|menyatu|tidak berinteraksi
+2.1.0.5|1|Resistor 6 Ω dihubungkan ke baterai 12 V. Kuat arus yang mengalir adalah...|2 A|0,5 A|72 A|18 A
+2.1.0.5|2|Tiga lampu identik dipasang paralel pada baterai. Jika satu lampu dilepas, dua lampu lainnya...|tetap menyala dengan terang sama|ikut padam|menjadi lebih redup|menjadi lebih terang
+2.1.0.6|0|Planet terbesar di tata surya adalah...|Jupiter|Saturnus|Bumi|Neptunus
+2.1.0.6|0|Gerak Bumi mengelilingi Matahari disebut...|revolusi|rotasi|gerhana|presesi
+2.1.0.6|1|Pergantian musim di Bumi terjadi karena...|sumbu Bumi miring saat berevolusi|jarak Bumi ke Matahari berubah drastis|Bumi berotasi setiap hari|Bulan mengelilingi Bumi
+2.1.0.6|1|Gerhana Matahari terjadi ketika posisi benda langit berurutan...|Matahari, Bulan, Bumi segaris|Matahari, Bumi, Bulan segaris|Bulan, Matahari, Bumi segaris|Bumi, Matahari, Bulan tegak lurus
+2.1.0.6|2|Gerhana Bulan tidak terjadi setiap purnama. Penyebab utamanya adalah...|bidang orbit Bulan miring terhadap bidang orbit Bumi|Bulan terlalu kecil untuk tertutup|Bumi berhenti berotasi tiap bulan|Matahari berpindah tempat
+2.1.1.0|0|Alat yang tepat untuk mengukur panjang meja adalah...|meteran|termometer|neraca|gelas ukur
+2.1.1.0|0|Hasil pengamatan berupa angka hasil pengukuran disebut data...|kuantitatif|kualitatif|hipotetis|asumtif
+2.1.1.0|1|Catatan ‘daun berwarna hijau tua dan permukaannya licin’ merupakan data...|kualitatif|kuantitatif|kesimpulan|prediksi
+2.1.1.0|2|Pengamat A mencatat ‘es mencair karena panas’. Pengamat B mencatat ‘es berkurang 20 g dalam 10 menit pada suhu 30 °C’. Catatan B lebih baik karena...|memuat hasil ukur yang objektif|memuat penjelasan sebab|lebih singkat|tidak memuat waktu
+2.1.1.1|0|Variabel yang sengaja diubah dalam percobaan disebut variabel...|bebas|terikat|kontrol|tetap
+2.1.1.1|1|Dalam penyelidikan pengaruh cahaya terhadap pertumbuhan kecambah, variabel terikatnya adalah...|tinggi kecambah|intensitas cahaya|jenis biji|jumlah air
+2.1.1.2|1|Suhu air yang dipanaskan: menit 0 = 25°C, 4 = 65°C, 8 = 100°C, 10 = 100°C, 12 = 100°C. Kesimpulannya...|suhu berhenti naik saat air mendidih di 100°C|pemanas rusak setelah menit ke-8|air berubah menjadi es|termometer pasti salah
+2.1.1.2|2|Waktu ayunan empat kali pengukuran: 4,2 s; 4,0 s; 4,4 s; 4,2 s. Rata-ratanya adalah...|4,2 s|4,0 s|4,4 s|16,8 s
+2.1.1.3|0|Dugaan sementara yang diuji melalui percobaan disebut...|hipotesis|kesimpulan|data|variabel
+2.1.1.3|1|Hasil percobaan tidak sesuai hipotesis. Sikap ilmiah yang tepat adalah...|menerima hasil dan merevisi hipotesis|mengubah data agar sesuai hipotesis|mengabaikan percobaan itu|menyalahkan alat tanpa bukti
+2.1.1.3|1|Mistar yang ujungnya aus selalu menghasilkan ukuran lebih 1 cm. Kesalahan ini disebut...|kesalahan sistematis|kesalahan acak|kesalahan kebetulan|kesalahan hitung
+2.2.0.0|2|Rantai makanan: rumput, belalang, katak, ular, elang. Energi bagi elang paling kecil karena...|energi berkurang sekitar 90% pada tiap tingkat trofik|elang tidak memakan ular|rumput menyimpan semua energi|energi bertambah di tiap tingkat
+2.2.0.1|0|Besaran berikut yang termasuk besaran vektor adalah...|perpindahan|jarak|waktu|massa
+2.2.0.4|0|Efek rumah kaca terjadi ketika gas tertentu di atmosfer...|menahan radiasi inframerah dari permukaan Bumi|menyerap seluruh sinar Matahari|menghentikan rotasi Bumi|menghilangkan uap air
+2.2.0.4|1|Mencairnya lapisan es di daratan seperti Greenland menyebabkan...|kenaikan permukaan laut|penurunan permukaan laut|suhu laut turun drastis|salinitas laut naik
+2.2.1.0|0|Mikrometer sekrup memiliki ketelitian...|0,01 mm|0,1 mm|1 mm|0,001 mm
+2.2.1.0|0|Ketidakpastian pengukuran tunggal pada alat ukur analog umumnya adalah...|setengah skala terkecil|dua kali skala terkecil|sama dengan skala terbesar|sama dengan hasil ukur
+2.2.1.0|1|Jangka sorong (ketelitian 0,1 mm): skala utama 2,3 cm, garis nonius ke-6 berimpit. Hasil ukur...|2,36 cm|2,30 cm|2,63 cm|2,90 cm
+2.2.1.0|2|Lima pengukuran: 5,0; 5,1; 5,0; 5,9; 5,1 cm. Nilai 5,9 cm sebaiknya...|diperiksa penyebabnya sebelum diputuskan|langsung dihapus tanpa alasan|dijadikan satu-satunya nilai|dihitung dua kali
+2.2.1.1|0|Variabel yang dijaga tetap sama agar percobaan adil disebut variabel...|kontrol|bebas|terikat|acak
+2.2.1.1|0|Kelompok pembanding yang tidak diberi perlakuan disebut kelompok...|kontrol|eksperimen|sampel|populasi
+2.2.1.1|1|Penyelidikan pengaruh suhu terhadap laju reaksi Mg dengan HCl. Variabel bebasnya adalah...|suhu larutan HCl|waktu reaksi|volume gas terbentuk|massa Mg yang dipakai
+2.2.1.1|2|Siswa menguji pupuk pada tiga pot, tetapi jenis tanaman dan cahayanya berbeda. Kelemahan rancangan ini...|variabel lain tidak dikontrol sehingga hasil bias|jumlah pot terlalu sedikit|pupuk terlalu murah|tanaman terlalu sering disiram
+2.2.1.2|0|Pada grafik hubungan y terhadap x, gradien garis menunjukkan...|laju perubahan y terhadap x|nilai rata-rata data|jumlah data pengukuran|galat pengukuran
+2.2.1.2|1|Grafik jarak-waktu berupa garis lurus dari (0 s; 0 m) ke (10 s; 50 m). Kecepatan benda adalah...|5 m/s|0,2 m/s|500 m/s|60 m/s
+2.2.1.2|2|Tegangan 2; 4; 6 V menghasilkan arus 0,1; 0,2; 0,3 A. Kesimpulan yang tepat...|V sebanding dengan I, hambatan 20 Ω|V berbanding terbalik dengan I, hambatan 20 Ω|V sebanding dengan I, hambatan 0,05 Ω|V tidak bergantung pada I, hambatan 12 Ω
+2.2.1.3|0|Kesimpulan penelitian harus didasarkan pada...|data hasil penyelidikan|keyakinan peneliti|pendapat mayoritas|hasil yang diharapkan
+2.2.1.3|1|Penelitian dengan 3 sampel dipakai menyimpulkan seluruh populasi. Kelemahannya...|sampel terlalu kecil sehingga kurang mewakili|alat ukur terlalu mahal|hasilnya terlalu cepat|datanya terlalu rapi
+2.2.1.3|2|Penjualan es krim dan kasus tenggelam sama-sama naik di musim panas. Evaluasi yang tepat...|korelasi belum tentu sebab; musim panas faktor lain|es krim menyebabkan orang tenggelam|tenggelam menyebabkan penjualan es krim naik|data pasti salah karena tidak masuk akal
+3.0.0.0|0|Alat yang digunakan untuk menentukan arah mata angin adalah...|kompas|termometer|barometer|penggaris
+3.0.0.0|0|Penjelasan tentang arti simbol-simbol pada peta terdapat pada bagian...|legenda|judul|skala|garis tepi
+3.0.0.0|2|Pada peta berskala 1:100.000, jarak dua kota adalah 3 cm. Jarak sebenarnya kedua kota adalah...|3 km|30 km|300 m|300 km
+3.0.0.1|0|Sumber daya alam yang dapat diperbarui adalah...|hutan|batu bara|minyak bumi|gas alam
+3.0.0.1|2|Warga menebang hutan di lereng bukit tanpa menanam kembali, sehingga sering terjadi longsor. Tindakan paling tepat adalah...|menanam kembali pohon di lereng bukit|menebang lebih banyak pohon|membiarkan lahan gundul|membangun rumah di lereng bukit
+3.0.0.1|1|Pak Budi mengambil pasir dari sungai secara berlebihan. Akibat yang paling mungkin terjadi adalah...|sungai rusak dan tepiannya mudah longsor|sungai menjadi lebih bersih|air sungai makin jernih|ikan makin banyak
+3.0.0.2|0|Lingkungan yang terdiri atas gunung, sungai, dan hutan disebut lingkungan...|alam|buatan|sosial|ekonomi
+3.0.0.2|0|Taman kota, jalan raya, dan jembatan termasuk lingkungan...|buatan|alam|sosial|liar
+3.0.0.2|2|Selokan di dekat sekolah tersumbat sampah sehingga air menggenang. Langkah yang paling tepat dilakukan siswa adalah...|kerja bakti dan tidak membuang sampah sembarangan|membiarkan saja sampai hujan reda|menunggu orang lain membersihkan|membakar sampah di selokan
+3.0.1.0|2|Pak Tani menjual sayur ke pasar. Bu Ani membelinya, lalu mengolahnya menjadi sayur sop untuk dijual di warung. Bu Ani berperan sebagai...|konsumen sekaligus produsen|konsumen saja|produsen saja|distributor
+3.0.2.0|0|Rumah adat Joglo berasal dari daerah...|Jawa Tengah|Sumatra Barat|Papua|Sulawesi Selatan
+3.0.2.0|2|Teman baru di kelasmu berasal dari daerah lain dan logat bicaranya berbeda. Sikap yang tepat adalah...|menghargai dan mengajaknya berteman|menertawakan logatnya|menjauhinya|meniru dengan mengejek
+3.0.2.1|0|Kegiatan membersihkan lingkungan secara bersama-sama oleh warga disebut...|kerja bakti|lomba|rekreasi|arisan
+3.0.2.1|1|Warga bersama-sama membantu membangun kembali rumah tetangga yang terkena bencana. Sikap ini menunjukkan...|gotong royong|persaingan|sikap acuh|keserakahan
+3.0.2.2|0|Lambang sila pertama Pancasila adalah...|bintang|rantai|pohon beringin|kepala banteng
+3.0.2.2|2|Saat kerja kelompok, Dani memaksakan pendapatnya sendiri. Sikap sesuai sila keempat yang seharusnya dilakukan adalah...|bermusyawarah untuk mencapai mufakat|memaksa teman lain mengikutinya|keluar dari kelompok|memilih diam tanpa pendapat
+3.0.3.0|0|Proklamasi kemerdekaan Indonesia dibacakan pada tanggal...|17 Agustus 1945|1 Juni 1945|28 Oktober 1928|10 November 1945
+3.0.3.0|2|Setiap 17 Agustus sekolah mengadakan upacara bendera. Tujuan utama kegiatan ini adalah...|mengenang jasa pahlawan dan menumbuhkan cinta tanah air|hanya mengisi hari libur|menunjukkan siapa yang paling kuat|mencari hadiah
+3.0.3.1|0|Teks Proklamasi Kemerdekaan Indonesia dibacakan oleh...|Ir. Soekarno|Mohammad Hatta|Ki Hajar Dewantara|Jenderal Sudirman
+3.0.3.1|0|Tokoh yang dijuluki Bapak Pendidikan Nasional adalah...|Ki Hajar Dewantara|R.A. Kartini|Cut Nyak Dien|Ir. Soekarno
+3.0.3.1|2|R.A. Kartini memperjuangkan hak pendidikan bagi perempuan. Cara siswa meneladani perjuangan Kartini adalah...|belajar sungguh-sungguh dan menghargai kesempatan belajar semua anak|malas belajar karena sudah merdeka|membedakan anak laki-laki dan perempuan|menyuruh orang lain belajar saja
+3.1.0.0|2|Pontianak dilalui garis khatulistiwa. Kesimpulan paling tepat tentang iklim di kota ini adalah...|suhu tinggi sepanjang tahun dengan perbedaan musim kecil|memiliki empat musim yang jelas|suhu sangat dingin sepanjang tahun|bersalju pada musim dingin
+3.1.0.1|0|Gas rumah kaca utama penyebab pemanasan global adalah...|karbon dioksida|oksigen|nitrogen|argon
+3.1.0.1|0|Salah satu dampak pemanasan global adalah...|naiknya permukaan air laut|meluasnya lapisan es kutub|turunnya suhu rata-rata bumi|berkurangnya penguapan air laut
+3.1.0.2|0|Upaya mengurangi risiko bencana sebelum bencana terjadi disebut...|mitigasi|rehabilitasi|rekonstruksi|tanggap darurat
+3.1.0.2|0|Lembaga pemerintah yang menangani penanggulangan bencana secara nasional adalah...|BNPB|BPS|BUMN|BKKBN
+3.1.1.0|0|Kegiatan menghasilkan atau menambah nilai guna suatu barang disebut...|produksi|konsumsi|distribusi|investasi
+3.1.1.0|0|Contoh faktor produksi alam adalah...|lahan pertanian|gaji pegawai|mesin jahit|keahlian pengusaha
+3.1.1.0|2|Pabrik tahu menaikkan produksi dua kali lipat, padahal permintaan konsumen tidak bertambah. Dampak yang paling mungkin adalah...|barang menumpuk dan harga cenderung turun|harga pasti naik tajam|keuntungan otomatis naik dua kali lipat|konsumen otomatis bertambah
+3.1.1.1|0|Harga keseimbangan di pasar terbentuk ketika...|jumlah permintaan sama dengan jumlah penawaran|permintaan lebih besar dari penawaran|penawaran lebih besar dari permintaan|pemerintah menetapkan harga sepihak
+3.1.1.1|0|Pasar yang barangnya hanya dijual oleh satu penjual disebut pasar...|monopoli|persaingan sempurna|oligopoli|monopsoni
+3.1.1.1|1|Menjelang Lebaran harga daging sapi naik. Penyebab utamanya adalah...|permintaan meningkat sedangkan penawaran relatif tetap|permintaan menurun|penawaran meningkat tajam|konsumen enggan membeli
+3.1.1.2|0|Jual beli barang dan jasa melalui internet disebut...|perdagangan elektronik (e-commerce)|barter|konsinyasi|ekspor
+3.1.1.2|1|Pedagang pasar tradisional mulai menerima pembayaran QRIS. Manfaat utamanya adalah...|transaksi lebih cepat dan tercatat|uang kembalian makin banyak|harga barang otomatis turun|pembeli tidak perlu membayar
+3.1.2.0|1|Warga RW 05 membangun pos ronda bersama tanpa upah. Nilai yang paling tampak adalah...|kebersamaan dan kerelaan|persaingan|individualisme|mencari keuntungan
+3.1.2.1|0|Pancasila sebagai dasar negara tercantum dalam...|Pembukaan UUD 1945 alinea keempat|Pasal 1 UUD 1945|Sumpah Pemuda|Teks Proklamasi
+3.1.2.1|0|Sila ketiga Pancasila berbunyi...|Persatuan Indonesia|Kemanusiaan yang adil dan beradab|Ketuhanan Yang Maha Esa|Keadilan sosial bagi seluruh rakyat Indonesia
+3.1.2.1|1|Menghormati teman yang berbeda agama saat mereka beribadah merupakan pengamalan sila...|pertama|ketiga|keempat|kelima
+3.1.2.1|2|Seorang siswa menolak sekelompok dengan temannya karena berbeda suku. Sila yang paling jelas dilanggar adalah...|Persatuan Indonesia|Kerakyatan yang dipimpin oleh hikmat kebijaksanaan|Ketuhanan Yang Maha Esa|Keadilan sosial bagi seluruh rakyat Indonesia
+3.1.2.2|0|Penyelesaian konflik dengan bantuan pihak ketiga yang netral disebut...|mediasi|dominasi|segregasi|asimilasi
+3.1.2.2|1|Dua kelompok pemuda berselisih soal lahan parkir. Langkah awal paling tepat adalah...|berdialog dipandu tokoh masyarakat|saling mengancam|membiarkan konflik membesar|menyerang kelompok lain
+3.1.3.0|0|Budi Utomo, organisasi pergerakan nasional, didirikan pada tahun...|1908|1928|1945|1912
+3.1.3.0|2|Sumpah Pemuda 1928 dianggap penting bagi persatuan karena...|menyatukan pemuda dari berbagai daerah dalam identitas Indonesia|membubarkan semua organisasi kedaerahan|menandai kemerdekaan Indonesia|menetapkan Pancasila sebagai dasar negara
+3.1.3.1|0|Daerah penghasil utama cengkih dan pala pada masa lalu adalah...|Kepulauan Maluku|Kalimantan Barat|Nusa Tenggara Timur|Sumatra Selatan
+3.1.3.1|0|Berikut yang termasuk rempah-rempah adalah...|pala|jagung|kapas|tebu
+3.1.3.2|1|Pancasila sebagai dasar negara berarti Pancasila berfungsi sebagai...|sumber hukum dan pedoman penyelenggaraan negara|lagu kebangsaan|lambang negara semata|hanya hiasan dinding
+3.1.3.2|1|Peraturan daerah tidak boleh bertentangan dengan Pancasila. Hal ini menunjukkan Pancasila adalah...|sumber dari segala sumber hukum|aturan khusus untuk daerah|peraturan sementara|pendapat pribadi pemimpin
+3.1.3.2|2|Muncul usul mengganti dasar negara. Alasan Pancasila tetap dipertahankan adalah...|digali dari nilai bangsa dan mempersatukan keberagaman|hanya cocok untuk satu kelompok|dibuat oleh bangsa asing|tidak pernah dibahas oleh tokoh bangsa
+3.2.0.0|0|Lapisan bumi yang paling luar dan tempat manusia hidup disebut...|kerak bumi|mantel|inti luar|inti dalam
+3.2.0.0|0|Tiga lempeng utama yang bertemu di wilayah Indonesia adalah...|Indo-Australia, Eurasia, dan Pasifik|Afrika, Eurasia, dan Antartika|Amerika Utara, Pasifik, dan Afrika|Antartika, Nazca, dan Pasifik
+3.2.0.0|2|Pantai barat Sumatra sering mengalami gempa dan memiliki banyak gunung api. Penjelasan yang paling tepat adalah...|tumbukan lempeng Indo-Australia dengan lempeng Eurasia|letaknya jauh dari batas lempeng|curah hujan yang tinggi|angin muson yang kuat
+3.2.0.1|0|Dua jenis format data spasial dalam SIG adalah...|vektor dan raster|tabel dan grafik|titik dan teks|garis dan huruf
+3.2.0.1|0|Perolehan informasi objek di permukaan bumi tanpa kontak langsung disebut...|penginderaan jauh|survei lapangan|pemetaan manual|sensus penduduk
+3.2.0.1|2|Pemerintah mencari lokasi permukiman aman banjir. Data SIG yang paling relevan ditumpangsusunkan adalah...|kemiringan lereng, curah hujan, dan jaringan sungai|jumlah toko dan restoran|usia penduduk dan agama|harga tanah dan jenis kendaraan
+3.2.0.2|0|Alat untuk mencatat getaran gempa bumi adalah...|seismograf|barometer|higrometer|anemometer
+3.2.0.2|0|Contoh mitigasi nonstruktural adalah...|penyusunan peta rawan bencana dan latihan evakuasi|pembangunan tanggul|pembangunan pemecah gelombang|pembuatan bangunan tahan gempa
+3.2.0.2|1|Desa di lereng gunung api akan menyusun mitigasi. Langkah yang paling tepat adalah...|membuat jalur evakuasi dan sosialisasi zona rawan|menambah permukiman di zona bahaya|mengabaikan peringatan dini|menebang hutan di lereng
+3.2.1.0|0|Menurut hukum permintaan, jika harga naik maka jumlah barang yang diminta cenderung...|turun|naik|tetap|tak terhingga
+3.2.1.0|0|Menurut hukum penawaran, jika harga naik maka jumlah barang yang ditawarkan cenderung...|naik|turun|nol|tetap
+3.2.1.0|2|Harga cabai naik dari Rp40.000 menjadi Rp80.000 per kg akibat gagal panen. Analisis yang tepat adalah...|penawaran berkurang sehingga harga naik dan jumlah diminta turun|permintaan naik sehingga harga turun|penawaran naik sehingga harga naik|harga naik tanpa pengaruh pada pembeli
+3.2.2.0|0|Semboyan yang mencerminkan keberagaman bangsa Indonesia adalah...|Bhinneka Tunggal Ika|Tut Wuri Handayani|Gotong Royong|Merdeka atau Mati
+3.2.2.0|2|Kelompok mayoritas di suatu desa menolak pendirian rumah ibadah kelompok minoritas yang memenuhi syarat. Sikap yang sesuai prinsip multikultural adalah...|berdialog dan menjamin hak beribadah sesuai konstitusi|melarang secara sepihak|memaksa minoritas pindah|mengabaikan hak minoritas
+3.2.2.1|1|Dua syarat terjadinya interaksi sosial adalah...|kontak sosial dan komunikasi|persaingan dan konflik|kekayaan dan jabatan|kekerabatan dan kekuasaan
+3.2.2.1|2|Nelayan dan petambak berselisih soal wilayah, lalu bersepakat membagi wilayah secara adil. Proses ini disebut...|akomodasi|konflik terbuka|akulturasi|disintegrasi
+3.2.3.0|0|Tahap metode sejarah berupa pencarian dan pengumpulan sumber disebut...|heuristik|interpretasi|historiografi|verifikasi
+3.2.3.0|1|Peneliti menguji keaslian prasasti dari bahan dan tulisannya. Tahap ini disebut...|kritik ekstern|interpretasi|historiografi|heuristik
+3.2.3.0|1|Menafsirkan fakta sejarah dan menghubungkannya menjadi rangkaian peristiwa disebut...|interpretasi|heuristik|kritik sumber|periodisasi
+3.2.3.1|1|Prasasti Yupa dari Kutai ditulis dengan huruf Pallawa berbahasa Sanskerta. Hal ini menunjukkan...|adanya pengaruh budaya India|pengaruh budaya Arab|pengaruh budaya Eropa|pengaruh budaya Tiongkok semata
+3.2.3.1|2|Sriwijaya berkembang menjadi kerajaan maritim besar terutama karena...|letak strategis di jalur perdagangan Selat Malaka|letaknya jauh dari jalur pelayaran|hanya mengandalkan pertanian padi|penutupan pelabuhan bagi pedagang asing
+3.2.3.2|0|Pendiri Kerajaan Demak adalah...|Raden Patah|Sultan Agung|Sultan Hasanuddin|Sunan Gunung Jati
+3.2.3.2|1|Islam menyebar secara damai di Nusantara terutama melalui...|perdagangan dan perkawinan|penaklukan militer|pemaksaan|pengasingan
+3.2.3.2|1|Sunan Kalijaga menyebarkan Islam dengan pendekatan...|seni dan budaya seperti wayang|peperangan|larangan semua tradisi|penutupan pasar
+4.0.0.0|0|Which word is a greeting?|Hello|Banana|Table|Seven
+4.0.0.0|0|Ann says, ‘Hi! My name is Ann.’ What is her name?|Ann|Hi|My|Name
+4.0.0.0|1|It is eight o’clock in the morning. What do you say to your teacher?|Good morning, Miss.|Good night, Miss.|Good afternoon, Miss.|Good bye, Miss.
+4.0.0.1|0|Which activity do you do in the morning?|Brush my teeth|Watch the moon|Go to bed|Sleep at night
+4.0.0.1|0|Tom goes to school at seven. What does Tom do?|He goes to school.|He eats lunch.|He plays football.|He goes to bed.
+4.0.0.1|2|Dina studies at night and goes to bed at nine. What does she do before bed?|She studies.|She goes to school.|She eats breakfast.|She wakes up.
+4.0.1.1|0|Which one is a fruit?|Apple|Chicken|Rice|Cat
+4.0.1.1|0|Which animal can fly?|Bird|Fish|Cow|Dog
+4.0.1.1|2|Rina does not eat meat or fish. Which food does she eat?|Vegetables|Chicken|Beef|Fish
+4.0.1.2|0|What color is a ripe banana?|Yellow|Blue|Black|Purple
+4.0.2.0|0|Which sentence is correct?|I am a student.|I a student am.|Student I am a.|Am student I.
+4.0.2.0|0|Choose the correct word: She ___ a teacher.|is|am|are|be
+4.0.2.0|2|Which sentence has a mistake?|He are my friend.|She is my sister.|I am happy.|They are students.
+4.0.2.1|0|Choose the correct article: ___ apple|an|a|two|many
+4.1.0.0|0|Ben: ‘What time does the library open?’ Ann: ‘It opens at eight.’ When does the library open?|At eight|At nine|At noon|At night
+4.1.0.0|0|Which question asks about a place?|Where do you live?|When do you sleep?|Who is your friend?|What time is it?
+4.1.0.0|2|A: ‘Excuse me, how can I get to the post office?’ B: ‘Go straight and turn left.’ What does A want?|Directions|Money|A letter|A ticket
+4.1.0.1|0|NOTICE: The school library will be closed on Friday. Which day is the library closed?|Friday|Monday|Sunday|Thursday
+4.1.0.1|0|‘All students must come to the hall at 9 a.m.’ Who must come to the hall?|All students|All teachers|Only parents|Only guards
+4.1.0.1|1|‘The English club meeting is moved from Tuesday to Wednesday.’ When is the meeting now?|On Wednesday|On Tuesday|On Monday|On Thursday
+4.1.0.1|1|‘Lost: a blue bag near the canteen. Please call Rina at 0812-345.’ What should you do if you find the bag?|Call Rina|Go to the canteen|Buy a blue bag|Ask the teacher
+4.1.0.1|2|‘Sports Day is cancelled because of heavy rain. It will be held next week.’ Why was Sports Day cancelled?|The weather was bad.|The students were sick.|The field was sold.|The teacher was absent.
+4.1.1.0|0|My cat is small and white. It has green eyes. What color are the cat’s eyes?|Green|White|Black|Blue
+4.1.1.0|1|‘Mount Bromo is tall and beautiful. Many tourists visit it.’ What is the text about?|A mountain|A river|A beach|A city
+4.1.1.0|2|‘Budi is tall, kind and diligent. He always helps his friends.’ Which word best describes Budi?|Helpful|Lazy|Rude|Shy
+4.1.1.1|0|How to make tea: 1. Boil water. 2. Put a tea bag in a cup. 3. Pour the water. What do you do first?|Boil water|Pour the water|Drink the tea|Wash the cup
+4.1.1.1|0|Which word is often used in a procedure text?|First|Yesterday|Beautiful|Lovely
+4.1.1.1|1|To send an email: open the email, write the message, then click ‘Send’. What do you do before clicking ‘Send’?|Write the message|Close the email|Print the page|Turn off the phone
+4.1.1.1|2|A recipe says ‘Fry the egg after the oil is hot.’ Why do we wait?|The egg cooks better in hot oil.|The egg must be cold.|The oil must be cheap.|We must wash the egg.
+4.1.1.2|0|‘The school will have a bazaar on Saturday at 8 a.m.’ What is the announcement about?|A bazaar|An exam|A holiday|A trip
+4.1.1.3|0|Dina carries an umbrella and wears a raincoat. What is the weather probably like?|Rainy|Sunny|Windy and dry|Hot and clear
+4.1.1.3|1|‘Tom’s eyes are red and he keeps yawning.’ What can we infer about Tom?|He is sleepy.|He is hungry.|He is excited.|He is angry.
+4.1.2.1|0|‘Last Sunday, I visited my grandmother.’ When did the writer visit her?|Last Sunday|Next Sunday|Every Sunday|Today
+4.1.2.1|0|Which sentence is in the past tense?|We went to the zoo yesterday.|We go to the zoo every day.|We are going to the zoo.|We will go to the zoo.
+4.1.2.1|1|‘We arrived at the beach at noon. After that, we built a sandcastle.’ What did they do after arriving?|They built a sandcastle.|They went home.|They ate dinner.|They slept.
+4.1.2.1|2|In a recount text, the events are usually arranged...|in the order they happened|from the least important|in a random order|by the length of sentences
+4.1.2.2|0|Which sentence gives an opinion?|I think English is fun.|English has 26 letters.|English is a subject.|We have English on Monday.
+4.1.2.2|0|‘In my opinion, students should read more books.’ What is the writer’s opinion?|Students should read more.|Students read too much.|Books are expensive.|Students should not study.
+4.1.2.2|1|Which expression is used to agree with someone?|I agree with you.|I don’t think so.|I disagree.|That’s wrong.
+4.2.0.0|0|‘Plastic waste pollutes our oceans and harms marine animals.’ What problem is mentioned?|Plastic waste|Lack of water|Traffic jams|Noise at school
+4.2.0.0|0|‘Global warming is caused by too many greenhouse gases.’ What causes global warming?|Greenhouse gases|Cold weather|Too many trees|Heavy rain
+4.2.0.0|1|‘Many teenagers spend over six hours a day on social media, so their sleep is often disturbed.’ What is a likely effect?|They get less sleep.|They study longer.|They exercise more.|They eat healthier.
+4.2.0.0|1|Which action best helps reduce plastic waste?|Bringing a reusable bag|Buying more plastic bottles|Burning rubbish|Using one bag per item
+4.2.0.0|2|‘Online learning gives flexibility but can reduce social interaction.’ Which statement best summarises this?|It has both benefits and drawbacks.|It is always better than classes.|It has no benefits.|It is only for adults.
+4.2.0.1|0|Which phrase is used to express an opinion?|In my view|As a result|For example|Last week
+4.2.0.1|0|Which phrase expresses disagreement?|I’m afraid I don’t agree.|I couldn’t agree more.|That’s exactly right.|You’re absolutely right.
+4.2.0.1|1|‘I couldn’t agree more.’ What does the speaker mean?|I completely agree.|I partly disagree.|I am not sure.|I do not care.
+4.2.0.1|2|Which reply is the most polite way to disagree?|I see your point, but I think differently.|That is silly.|You know nothing.|Stop talking.
+4.2.1.0|0|In a narrative text, which part tells the problem the characters face?|Complication|Orientation|Resolution|Title
+4.2.1.0|0|‘Once upon a time, a poor farmer lived near a forest.’ This sentence is part of the...|orientation|complication|resolution|reorientation
+4.2.1.0|1|‘Finally, the boy found his lost dog and went home happily.’ This sentence is the...|resolution|orientation|complication|title
+4.2.1.0|2|The fox tricked the crow into singing and took its cheese. What does the fox show?|Cleverness|Honesty|Generosity|Fear
+4.2.1.1|0|What is the thesis in an analytical exposition?|The writer’s main position|A list of characters|The ending of a story|A set of instructions
+4.2.1.1|0|Which word is used to add a supporting point?|Furthermore|However|Once upon a time|Yesterday
+4.2.1.1|1|‘Students should wear uniforms. First, uniforms make students equal.’ What is ‘First, uniforms make students equal.’?|An argument|A thesis|A conclusion|A title
+4.2.1.1|2|Which statement is the strongest support for ‘Exercise is important’?|Exercise lowers the risk of many diseases.|I like exercise.|My friend runs daily.|Exercise is done outside.
+4.2.1.2|1|‘On the other hand, some people think homework helps students learn.’ What does the phrase show?|A contrasting view|A final conclusion|A list of steps|A time order
+4.2.1.2|2|Which conclusion fits a discussion about school uniforms with both pros and cons?|Both sides have valid points, so schools should decide carefully.|Uniforms are always perfect.|Uniforms should be banned immediately.|Nobody has an opinion.
+4.2.2.0|0|Choose the correct sentence.|She has lived here since 2015.|She have lived here since 2015.|She live here since 2015.|She is live here since 2015.
+4.2.2.0|2|Which sentence is grammatically correct?|The books that I bought were expensive.|The books that I bought was expensive.|The books what I bought were expensive.|The books who I bought was expensive.
+4.2.2.1|0|If it rains tomorrow, we ___ at home.|will stay|would stay|stayed|had stayed
+4.2.2.1|1|If I were you, I ___ harder.|would study|will study|studied|am studying
+4.2.2.1|2|‘If she had left earlier, she would have caught the train.’ What happened?|She missed the train.|She caught the train.|She did not go.|She left early.
+4.2.2.2|0|What is the closest meaning of ‘enormous’?|Very big|Very small|Very old|Very quiet
+4.2.2.2|0|What is the closest meaning of ‘reluctant’?|Unwilling|Eager|Brave|Careless
+4.2.2.2|1|The scientist made an important ___ after years of research.|discovery|decision|dessert|distance
+4.2.2.2|2|Which word is the opposite of ‘scarce’?|Abundant|Rare|Limited|Tiny
+0.2.1.0|0|Himpunan penyelesaian dari x + 3 > 7 adalah ...|x > 4|x < 4|x > 10|x < 10
+0.2.1.0|2|Himpunan penyelesaian dari (x - 2)(x + 3) < 0 adalah ...|-3 < x < 2|x < -3 atau x > 2|-2 < x < 3|x < -2 atau x > 3`;
+const BNI=B(BN).map(l=>{const p=l.split('|'),k=p[0].split('.');return{su:+k[0],lv:+k[1],c:k[2]+'.'+k[3],d:+p[1],q:[p[2],p.slice(3)]}});
+const BQ=()=>BNI.filter(x=>x.su==su&&x.lv==lv).map(x=>({s:'',q:x.q,tag:['Literasi dasar','Pemahaman & penerapan','Berpikir kritis'][x.d],d:x.d,c:x.c}));
+function flagTex(){const c=document.createElement('canvas');c.width=120;c.height=80;const x=c.getContext('2d');x.fillStyle='#d32f2f';x.fillRect(0,0,120,40);x.fillStyle='#fff';x.fillRect(0,40,120,40);const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;return t}
+function mkSchool(gx){const g=new THREE.Group(),w=Mt('#f3ead7',{roughness:.85}),rf=Mt('#a33a2a',{roughness:.6}),gl=Mt('#9fd4ee',{roughness:.1,metalness:.6,emissive:'#274b66',emissiveIntensity:.3}),gd=Mt('#6b4a2b'),ln=Mt('#2d6a4f');
+ const a=(G,m,x,y,z,sx,sy,sz)=>add(G,m,x,y,z,sx,sy,sz,g);
+ const sg=(t,bg,fs)=>{const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');x.fillStyle=bg;x.fillRect(0,0,256,64);x.fillStyle='#fff';x.font='bold '+fs+'px sans-serif';x.textAlign='center';x.fillText(t,128,44);const q=new THREE.CanvasTexture(c);q.encoding=THREE.sRGBEncoding;return Mt('#fff',{map:q})};
+ a(GBX,w,0,2.2,-5,13,4.4,4);a(GBX,rf,0,4.55,-5,13.8,.3,4.6);a(GBX,w,0,5.5,-5,6,1.8,3.4);a(GBX,rf,0,6.55,-5,6.6,.3,3.9);
+ for(const i of[-2,-1,1,2]){a(GBX,gl,i*2.5,3.1,-2.97,1.3,1.1,.06);a(GBX,gl,i*2.5,1.4,-2.97,1.3,1.1,.06)}
+ a(GBX,gl,-1.8,5.6,-3.27,1.1,.9,.06);a(GBX,gl,1.8,5.6,-3.27,1.1,.9,.06);
+ a(GBX,gd,0,1.1,-2.95,1.9,2.2,.1);a(GBX,sg('SEKOLAH','#1b5e20',34),0,3.6,-2.93,4,1,.08);a(GBX,Mt('#bdbdbd'),0,.1,-2.4,3.2,.2,1.2);
+ a(GCY,Mt('#ccc',{metalness:.8}),5.2,7.2,-4.6,.06,5,.06);a(new THREE.PlaneGeometry(1.8,1.2),new THREE.MeshStandardMaterial({map:flagTex(),side:THREE.DoubleSide}),6.1,8.9,-4.6,1,1,1);
+ for(const s of[-1,1]){a(GBX,w,s*2.4,1.6,-1.6,.7,3.2,.7);a(GBX,rf,s*2.4,3.3,-1.6,1,.22,1);a(GBX,w,s*4.9,.6,-1.6,4.3,1.2,.3);a(GBX,ln,s*4.9,1.3,-1.6,4.3,.1,.34);a(GBX,Mt('#37474f',{metalness:.6}),s*2.8,.9,-1,.08,1.8,1.2);a(GSP,Mt('#2e7d32'),s*5.8,.5,-2.5,1.1,.7,.9)}
+ a(GBX,sg('SELAMAT DATANG','#1b5e20',26),0,3.0,-1.6,4.1,1,.15);
+ g.position.set(gx,0,0);S.add(g)}
+function mkCoin(x,y){const g=new THREE.Group(),o=add(GCY,Mt('#ffc400',{metalness:1,roughness:.25,emissive:'#6a4a00',emissiveIntensity:.3}),0,0,0,.35,.06,.35,g);o.rotation.x=Math.PI/2;g.position.set(X(x+10),Y(y+10),0);S.add(g);coins.push({x,y,w:20,h:20,m:g})}
+function rs(){const w=Math.max(360,Math.min(innerWidth-12,1900)),h=Math.max(260,Math.min(innerHeight-12,w/1.0));Rr.setSize(w,h,false);C.aspect=w/h;C.updateProjectionMatrix();$('wrap').style.width=w+'px';$('wrap').style.setProperty('--u',(Math.min(h,w*.62)/100)+'px')}
+function quit(){over=1;show('home')}
+const kmap={ArrowLeft:'l',a:'l',A:'l',ArrowRight:'r',d:'r',D:'r',ArrowUp:'j',w:'j',W:'j',' ':'j'};
+addEventListener('keydown',e=>{if(kmap[e.key]){K[kmap[e.key]]=1;if($('game').classList.contains('on'))e.preventDefault()}});
+addEventListener('keyup',e=>{if(kmap[e.key])K[kmap[e.key]]=0});
+[['bj','j']].forEach(([id,k])=>{const b=$(id);b.onpointerdown=e=>{e.preventDefault();K[k]=1};['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>K[k]=0))});
+
+const TAG=['Mengingat &amp; menemukan informasi','Inferensi &amp; penalaran','Berpikir kritis'];
+function ask(b){paused=true;K={};const[q,o]=b.d.q,right=o[0];let opts=shuf(o.slice());
+ if(df==0){const w=opts.filter(x=>x!==right);const rm=w[R(w.length)];opts=opts.filter(x=>x!==rm)}
+ $('qt').innerHTML=(su==0?'Numerasi':'Literasi')+' · '+b.d.tag+' · Soal '+(b.i+1)+'/'+NQ;$('qs').textContent=b.d.s;$('qs').style.display=b.d.s?'block':'none';$('qq').textContent=q;$('qf').textContent=df==2?'⏱ 25 detik':'';$('qo').innerHTML='';
+ let left=25;clearInterval(tmr);
+ const fin=(t,e)=>{clearInterval(tmr);[...$('qo').children].forEach(x=>{x.disabled=1;if(x.textContent==right)x.classList.add('ok')});
+  const ok=t==right;if(e&&!ok)e.classList.add('no');b.done=1;b.ok=ok;b.m.material.map=qTex(ok?'✓':'✗',ok?'#2e7d32':'#c62828');b.m.material.emissiveIntensity=0;b.m.material.needsUpdate=true;
+  if(ok)score+=100;else lives--;
+  $('qf').textContent=ok?'✅ Benar! +100 poin':(t==null?'⏱ Waktu habis. ':'❌ Salah. ')+'Jawaban benar: '+right;
+  setTimeout(()=>{$('qm').classList.remove('on');if(lives<=0)end(0);else{paused=false;inv=60}},1500)};
+ opts.forEach(t=>{const e=document.createElement('button');e.className='opt';e.textContent=t;e.onclick=()=>fin(t,e);$('qo').appendChild(e)});
+ if(df==2)tmr=setInterval(()=>{left--;$('qf').textContent='⏱ '+left+' detik';if(left<=0)fin(null)},1000);
+ $('qm').classList.add('on')}
+function end(w){over=1;const n=blocks.filter(b=>b.ok).length,r=n/NQ,st=w?(r>=.9?3:r>=.6?2:1):0;
+ $('rt').textContent=w?'🎉 Misi Selesai!':'💔 Misi Gagal';$('rp').innerHTML=(w?'⭐'.repeat(st)+'☆'.repeat(3-st)+'<br>':'')+`Soal benar: ${n}/${NQ}<br>Skor: ${score}`;$('rs').classList.add('on')}
+function hurt(){if(inv>0)return;lives--;inv=90;P.vy=-JV*.5;P.vx=-3*P.f;if(lives<=0)end(0)}
+function step(){const p=P;fr++;if(inv>0)inv--;
+ const T=PHY[th.k],tg=(K.l?-1:0)+(K.r?1:0);if(tg)p.f=tg;
+ if(T){p.vx+=(tg*T.sp-p.vx)*(p.on?.2:1-T.ih);if(Math.abs(p.vx)<.05)p.vx=0}else p.vx=tg*1.8;
+ if(T&&T.bo&&K.j&&!p.jh&&!p.on&&fr-(p.bt||-99)>T.cd){p.vy=-JV*T.bo;p.bt=fr;puff(p)}
+ if(K.j&&p.on){p.vy=-JV;p.on=0}p.jh=!!K.j;
+ p.vy+=th.gr;if(T&&p.vy>T.tm)p.vy=T.tm;p.x+=p.vx;for(const q of plats)if(hit(p,q))p.x=p.vx>0?q.x-p.w:q.x+q.w;
+ p.x=Math.max(0,Math.min(L-p.w,p.x));p.y+=p.vy;p.on=0;
+ for(const q of plats)if(hit(p,q)){if(p.vy>0){p.y=q.y-p.h;p.on=1}else p.y=q.y+q.h;p.vy=0}
+ if(p.y+p.h>=GY){p.y=GY-p.h;p.vy=0;p.on=1}
+ for(const b of blocks)if(!b.done&&hit(p,b)){ask(b);return}
+ coins=coins.filter(k=>{if(hit(p,k)){score+=10;S.remove(k.m);return 0}return 1});
+ for(const e of ens){if(e.dead)continue;e.x+=e.v;if(e.x<e.a||e.x>e.b)e.v*=-1;if(e.fl)e.y=e.by+Math.sin(fr*e.fq+e.ph)*e.am;
+  if(hit(p,e)){if(p.vy>0&&p.y+p.h-p.vy<=e.y+12){e.dead=1;S.remove(e.m);p.vy=-JV*.6;score+=50}else hurt()}}
+ for(const f of FB){f.x+=f.vx;f.t++;if(f.t>110||plats.some(q=>hit(f,q)))f.dead=1;else for(const e of ens)if(!e.dead&&hit(f,e)){e.dead=1;S.remove(e.m);f.dead=1;score+=50}if(!f.dead&&boss&&!boss.dead&&hit(f,boss)){f.dead=1;bossHit()}}
+ FB=FB.filter(f=>{if(f.dead)S.remove(f.m);return !f.dead});
+ if(!boss&&blocks.every(b=>b.done))spawnBoss();
+ if(boss&&!boss.dead)stepBoss();
+ for(const f of BF){f.x+=f.vx;f.t++;if(f.y<GY-f.h){f.vy+=.12;f.y=Math.min(GY-f.h,f.y+f.vy)}if(f.t>260||f.x<-80||f.x>L+80)f.dead=1;else if(hit(p,f)){f.dead=1;hurt()}}
+ BF=BF.filter(f=>{if(f.dead)S.remove(f.m);return !f.dead});
+ if(hit(p,{x:L-90,y:GY-120,w:50,h:120})){if(blocks.every(b=>b.done)){if(!boss||boss.dead){end(1);return}$('toast').textContent='Kalahkan Raja '+(th.k=='sea'?'Gurita':'Naga')+' dulu! 🔥';toast=90}else{$('toast').textContent='Jawab semua kotak ? dulu!';toast=90}}}
+function sync(){const p=P,t=fr*.23,mv=!over&&!paused&&p.vx,g=PL.g;
+ g.position.set(X(p.x+p.w/2),Y(p.y+p.h),0);g.rotation.y+=((p.f>0?1.2:-1.2)-g.rotation.y)*.25;g.visible=!(inv>0&&fr%6<3);{const ar=!p.on,sea=th.k=='sea',zg=th.k=='space'||th.k=='moon';g.rotation.order='YXZ';g.rotation.x+=((ar&&sea?.95:ar&&zg?-.25+Math.sin(fr*.04)*.12:0)-g.rotation.x)*.15;if(ar&&(sea||zg))g.position.y+=.12+Math.sin(fr*.08)*.06}
+ const f=Math.sin(t*.95),w0=mv&&p.on;
+ if(!p.on&&th.k=='sea'){const s=Math.sin(fr*.35),w=Math.sin(fr*.2);PL.lL.rotation.x=s*.5;PL.lR.rotation.x=-s*.5;PL.kL.rotation.x=Math.max(0,-s)*.6;PL.kR.rotation.x=Math.max(0,s)*.6;PL.aL.rotation.x=-2.6+w*.6;PL.aR.rotation.x=-2.6-w*.6;PL.eL.rotation.x=-.1;PL.eR.rotation.x=-.1}
+ else if(!p.on&&(th.k=='space'||th.k=='moon')){const w=Math.sin(fr*.06);PL.lL.rotation.x=.3+w*.25;PL.lR.rotation.x=.5-w*.25;PL.kL.rotation.x=.5;PL.kR.rotation.x=.7;PL.aL.rotation.x=-1.2+w*.35;PL.aR.rotation.x=-1-w*.35;PL.eL.rotation.x=-.4;PL.eR.rotation.x=-.4}
+ else if(!p.on){PL.lL.rotation.x=-.7;PL.lR.rotation.x=.35;PL.kL.rotation.x=.6;PL.kR.rotation.x=.9;PL.aL.rotation.x=-2.3;PL.aR.rotation.x=-2;PL.eL.rotation.x=-.3;PL.eR.rotation.x=-.3}
+ else if(w0){PL.lL.rotation.x=-f*.85;PL.lR.rotation.x=f*.85;PL.kL.rotation.x=Math.max(0,f)*1.1;PL.kR.rotation.x=Math.max(0,-f)*1.1;PL.aL.rotation.x=f*.8;PL.aR.rotation.x=-f*.8;PL.eL.rotation.x=-.5;PL.eR.rotation.x=-.5}
+ else{const br=Math.sin(fr*.05)*.03;[PL.lL,PL.lR,PL.kL,PL.kR,PL.eL,PL.eR].forEach(o=>o.rotation.x=0);PL.aL.rotation.x=br;PL.aR.rotation.x=-br}
+ coins.forEach(k=>k.m.rotation.y+=.06);blocks.forEach(b=>{if(!b.done)b.m.rotation.y=Math.sin(fr*.04)*.15});
+ ens.forEach(e=>{if(!e.dead){if(e.fl){e.m.position.set(X(e.x+e.w/2),Y(e.y+e.h/2),0);const ry=e.m.userData.ry||.75;e.m.rotation.y=e.v>0?ry:-ry;if(e.m.userData.tl)e.m.userData.tl.rotation.y=Math.sin(fr*.3+e.ph)*.5;const fp=Math.sin(fr*(e.k=='bat'?.55:.35)+e.ph)*.75,u=e.m.userData;u.w1.rotation.z=fp;u.w2.rotation.z=-fp}else{e.m.position.set(X(e.x+15),Y(e.y+30)+Math.abs(Math.sin(fr*.15))*.12,0);const ry=e.m.userData.ry;e.m.rotation.y=ry!=null?ry+Math.sin(fr*.2)*.12:(e.v>0?1.2:-1.2);if(e.m.userData.cl)e.m.userData.cl.forEach((c,i)=>c.rotation.z=(i?-1:1)*Math.sin(fr*.25+i)*.35)}}});
+ flag.rotation.y=Math.sin(fr*.08)*.3;
+ BF.forEach(f=>{f.m.position.set(X(f.x+f.w/2),Y(f.y+f.h/2),0);f.m.rotation.y=f.vx<0?Math.PI:0;f.m.scale.setScalar(.8*(1+Math.sin(fr*.5)*.1))});
+ if(boss&&boss.m){const b=boss,m=b.m,u=m.userData;
+  if(b.dead){if(b.dying>0){b.dying--;m.rotation.z+=.05;m.position.y-=.05;m.scale.multiplyScalar(.985);if(!b.dying)S.remove(m)}}
+  else{m.position.set(X(b.x+b.w/2)+(b.hit>0?Math.sin(fr*2)*.1:0),Y(b.y+b.h),0);m.rotation.y+=((b.dir>0?1.4:-1.4)-m.rotation.y)*.1;const fy=b.ph>0&&b.ph<3,fp=Math.sin(fr*(fy?.3:.12))*(fy?.7:.35);u.w1.rotation.z=fp;u.w2.rotation.z=-fp;u.mo.scale.setScalar(b.br>0?.14+(26-b.br)/26*.4:.14)}}
+ FB.forEach(f=>{f.m.position.set(X(f.x+8),Y(f.y+8),0);f.m.rotation.z+=.3;f.m.scale.setScalar(1+Math.sin(fr*.5)*.12)});
+ BGL.forEach(o=>{const u=o.userData;let y=u.y;
+  if(u.m=='w'||u.m=='h'){u.x+=u.v*u.dir*.22;if(Math.abs(u.x-u.hx)>10)u.dir*=-1;y+=u.m=='h'?Math.abs(Math.sin(fr*.14+u.ph))*u.sz*.5:Math.abs(Math.sin(fr*.2+u.ph))*u.sz*.04}
+  else if(u.m=='f'){u.x+=u.v*u.dir*.22;if(u.x>BX1)u.x=BX0;if(u.x<BX0)u.x=BX1;if(u.fl)y+=Math.sin(fr*.04+u.ph)*1.2}
+  else if(u.m=='u'){u.y+=u.v*.22;if(u.y>u.hi)u.y=u.lo;y=u.y}
+  else if(u.m=='b')y+=Math.sin(fr*.05+u.ph)*.5;
+  o.position.set(u.x,y,u.z);o.scale.set(u.sz*(u.flip&&u.dir>0?-1:1),u.sz,1)});
+ const tx=Math.max(7,Math.min(L/U-3,X(p.x)+3));camX+=(tx-camX)*.06;
+ camY+=(Math.max(3.2,Y(p.y+p.h)+1.8)-camY)*.06;C.position.set(camX,camY,9.5);C.lookAt(camX+.5,camY-1.2,0);DL.position.set(camX+8,16,10);DL.target.position.set(camX,0,0);
+ SKY.forEach(o=>{o.m.position.x=camX*o.f+o.ox;if(o.r)o.m.rotation.y+=o.r});
+ SW.forEach(o=>{const m=o.m,t=o.t;if(t=='s')m.rotation.z=Math.sin(fr*.03+o.ph)*.16;else if(t=='b'){m.position.y+=o.v;m.position.x+=Math.sin(fr*.05+o.ph)*.004;if(m.position.y>16)m.position.y=.3}else if(t=='j'){m.position.y=o.y0+Math.sin(fr*.02+o.ph)*o.a;if(o.pu)m.scale.y=o.sy*(1+Math.sin(fr*.08+o.ph)*.12)}else if(t=='r'){m.rotation.x+=o.rx;m.rotation.y+=o.ry;m.position.y=o.y0+Math.sin(fr*.01+o.ph)*.5}});
+ PA.forEach(o=>{o.m.position.y+=o.vy;o.t--;o.m.scale.multiplyScalar(.97);o.m.material.opacity=Math.max(0,o.t/60)});PA=PA.filter(o=>{if(o.t<=0)S.remove(o.m);return o.t>0});
+ $('h1').textContent='❤'.repeat(Math.max(lives,0))+'  ⭐ '+score;$('h2').textContent=th.e+' '+th.n+' · '+SUB[su].n+' · ❓ '+blocks.filter(b=>b.done).length+'/'+NQ+(boss&&!boss.dead?'  '+(th.k=='sea'?'🐙':'🐉')+'❤'.repeat(boss.hp)+'🖤'.repeat(4-boss.hp):'');
+ $('toast').style.opacity=toast>0?1:0;if(toast>0)toast--}
+
+function mkBat(){const g=new THREE.Group(),d=Mt('#3b2a52',{roughness:.6}),e=Mt('#ff1744',{emissive:'#ff1744',emissiveIntensity:1});
+ add(GSP,d,0,0,0,.2,.24,.18,g);add(GSP,d,0,.26,.02,.14,.13,.13,g);
+ [-1,1].forEach(s=>{add(GCO,d,s*.07,.4,.02,.05,.14,.05,g);add(GSP,e,s*.05,.28,.13,.03,.03,.03,g)});
+ const mw=s=>{const w=new THREE.Group();w.position.set(s*.12,.05,0);g.add(w);add(GBX,d,s*.28,0,0,.55,.03,.38,w);add(GBX,d,s*.52,-.03,-.05,.22,.03,.26,w);return w};
+ g.userData={w1:mw(-1),w2:mw(1)};g.scale.setScalar(1.1);return g}
+function mkEagle(){const g=new THREE.Group(),b=Mt('#5d4037',{roughness:.7}),w=Mt('#fafafa'),y=Mt('#ffb300'),k=Mt('#111');
+ add(GSP,b,0,0,0,.2,.2,.45,g);add(GSP,w,0,.12,.45,.16,.16,.18,g);add(GCO,y,0,.08,.7,.07,.2,.07,g).rotation.x=Math.PI/2;
+ [-1,1].forEach(s=>add(GSP,k,s*.08,.17,.55,.03,.03,.03,g));add(GBX,w,0,0,-.55,.22,.03,.32,g);
+ const mw=s=>{const q=new THREE.Group();q.position.set(s*.15,.05,0);g.add(q);add(GBX,b,s*.35,0,0,.7,.03,.42,q);add(GBX,Mt('#3e2723'),s*.72,0,-.05,.3,.03,.3,q);return q};
+ g.userData={w1:mw(-1),w2:mw(1)};g.scale.setScalar(.9);return g}
+function mkFly(k,cx){const b=k=='bat',sp=1+df*.15,rg=(b?90:130)+Math.random()*80,by=GY-(115+Math.random()*60),am=12+Math.random()*13,e={fl:1,k,x:cx,y:by,w:b?34:46,h:26,v:(b?1:1.5)*sp*(Math.random()<.5?-1:1)*(.85+Math.random()*.3),a:cx-rg,b:cx+rg,by,am,fq:(b?.06:.035)*(.8+Math.random()*.5),ph:Math.random()*6};e.m=th.k=='sea'?(b?mkPuffer():mkShark()):(b?mkBat():mkEagle());S.add(e.m);ens.push(e)}
+function mkDragon(){const g=new THREE.Group(),rd=Mt('#b71c1c',{roughness:.5}),dk=Mt('#7f0000',{roughness:.6}),bl=Mt('#ffcc80',{roughness:.7}),wg=Mt('#6a1b9a',{roughness:.6}),gd=Mt('#ffd600',{metalness:.8,roughness:.3}),hn=Mt('#fff3cd');
+ const a=(G,m,x,y,z,sx,sy,sz)=>add(G,m,x,y,z,sx,sy,sz,g);
+ a(GSP,rd,0,1.25,0,.95,.8,1.35);a(GSP,bl,0,1.05,.2,.78,.55,1.1);
+ a(GCY,rd,0,1.95,1.05,.34,.8,.34).rotation.x=.7;
+ a(GSP,rd,0,2.45,1.5,.5,.42,.6);a(GBX,rd,0,2.32,1.95,.38,.26,.5);
+ const mo=a(GSP,Mt('#ff6d00',{emissive:'#ff3d00',emissiveIntensity:1.6}),0,2.3,2.2,.14,.14,.14);
+ [-1,1].forEach(s=>{a(GSP,Mt('#ffeb3b',{emissive:'#ffd600',emissiveIntensity:1}),s*.26,2.62,1.75,.09,.09,.09);a(GSP,Mt('#111'),s*.26,2.62,1.83,.045,.045,.045);
+  a(GCO,hn,s*.42,2.95,1.3,.1,.5,.1).rotation.x=-.4;
+  for(const z of[.55,-.55]){a(GCY,dk,s*.45,.35,z,.2,.7,.2);a(GBX,dk,s*.45,.05,z+.12,.34,.12,.4)}});
+ a(GCY,gd,0,2.88,1.5,.32,.12,.32);for(let k=0;k<5;k++){const t=k*1.2566;a(GCO,gd,Math.cos(t)*.28,3.05,1.5+Math.sin(t)*.28,.07,.22,.07)}
+ a(GCO,rd,0,.85,-1.7,.38,1.4,.38).rotation.x=-Math.PI/2;a(GCO,gd,0,.85,-2.55,.15,.4,.15).rotation.x=-Math.PI/2;
+ for(let k=0;k<5;k++)a(GCO,dk,0,2.0-k*.02,.8-k*.4,.12,.3,.12);
+ const mw=s=>{const q=new THREE.Group();q.position.set(s*.55,1.9,-.1);g.add(q);add(GBX,wg,s*.9,.1,0,1.7,.05,1.2,q);add(GBX,wg,s*1.6,0,-.2,.8,.05,.8,q);return q};
+ g.userData={w1:mw(-1),w2:mw(1),mo};g.scale.setScalar(1.05);return g}
+
+function mkCrab(){const g=new THREE.Group(),b=Mt('#e8532f',{roughness:.45}),d=Mt('#a8321a'),wh=Mt('#fff'),bk=Mt('#111'),cl=[];
+ add(GSP,b,0,.4,0,.55,.3,.42,g);
+ [-1,1].forEach(s=>{add(GCY,d,s*.18,.72,.25,.03,.2,.03,g);add(GSP,wh,s*.18,.86,.25,.09,.09,.09,g);add(GSP,bk,s*.18,.86,.32,.045,.045,.045,g);
+  const a=new THREE.Group();a.position.set(s*.5,.45,.12);g.add(a);add(GCY,b,s*.2,.1,0,.05,.32,.05,a).rotation.z=s*.9;add(GSP,b,s*.42,.3,0,.2,.15,.1,a);add(GCO,d,s*.5,.46,0,.07,.2,.04,a).rotation.z=-s*.5;cl.push(a);
+  for(let j=0;j<3;j++)add(GCY,d,s*(.42+j*.04),.17,.22-j*.18,.025,.32,.025,g).rotation.z=s*1.0});
+ g.userData={ry:0,cl};g.scale.setScalar(.75);return g}
+function mkPuffer(){const g=new THREE.Group(),b=Mt('#ffcf4a',{roughness:.5}),sp=Mt('#d9902a'),wh=Mt('#fff'),bk=Mt('#111');
+ add(GSP,b,0,0,0,.34,.34,.42,g);add(GSP,Mt('#fff3c4'),0,-.1,.04,.28,.2,.36,g);
+ for(let i=0;i<16;i++){const y=1-2*(i+.5)/16,rr=Math.sqrt(1-y*y),a=i*2.4,d=new THREE.Vector3(Math.cos(a)*rr,y,Math.sin(a)*rr),o=add(GCO,sp,d.x*.34,d.y*.34,d.z*.42,.035,.14,.035,g);o.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d)}
+ [-1,1].forEach(s=>{add(GSP,wh,s*.2,.1,.3,.09,.09,.09,g);add(GSP,bk,s*.2,.1,.37,.045,.045,.045,g)});add(GSP,Mt('#ff8a80'),0,-.06,.42,.07,.05,.05,g);
+ const tl=new THREE.Group();tl.position.set(0,0,-.4);g.add(tl);add(GCO,sp,0,0,-.2,.2,.38,.04,tl).rotation.x=-Math.PI/2;
+ const fin=s=>{const q=new THREE.Group();q.position.set(s*.32,-.02,.05);g.add(q);add(GBX,sp,s*.16,0,0,.3,.03,.18,q);return q};
+ g.userData={w1:fin(-1),w2:fin(1),tl,ry:1.3};g.scale.setScalar(1.2);return g}
+function mkShark(){const g=new THREE.Group(),b=Mt('#6f8fa8',{roughness:.45,metalness:.2}),wh=Mt('#f2f6f9'),bk=Mt('#111');
+ add(GSP,b,0,0,0,.28,.26,.8,g);add(GSP,wh,0,-.1,.05,.24,.15,.7,g);add(GCO,b,0,0,.85,.2,.4,.2,g).rotation.x=Math.PI/2;
+ add(GCO,b,0,.3,-.05,.05,.38,.24,g).rotation.x=-.5;
+ [-1,1].forEach(s=>{add(GSP,bk,s*.15,.07,.6,.035,.035,.035,g);add(GSP,wh,s*.07,-.06,.9,.03,.05,.03,g)});
+ const tl=new THREE.Group();tl.position.set(0,0,-.75);g.add(tl);add(GCO,b,0,.2,-.15,.04,.42,.2,tl).rotation.x=-.45;add(GCO,b,0,-.15,-.12,.04,.3,.16,tl).rotation.x=-2.5;
+ const fin=s=>{const q=new THREE.Group();q.position.set(s*.2,-.1,.25);g.add(q);add(GBX,b,s*.25,0,0,.5,.03,.22,q);return q};
+ g.userData={w1:fin(-1),w2:fin(1),tl,ry:1.3};g.scale.setScalar(.9);return g}
+function mkKraken(){const g=new THREE.Group(),pu=Mt('#8e3fb3',{roughness:.45}),dp=Mt('#5e2480',{roughness:.5}),gd=Mt('#ffd600',{metalness:.8,roughness:.3}),wh=Mt('#fff7c2',{emissive:'#ffd600',emissiveIntensity:.8}),bk=Mt('#111');
+ add(GSP,pu,0,2.0,0,1.05,1.2,1.05,g);add(GSP,dp,0,2.55,-.25,.9,.95,.9,g);
+ [-1,1].forEach(s=>{add(GSP,wh,s*.48,2.1,.85,.2,.2,.14,g);add(GSP,bk,s*.48,2.1,.98,.07,.14,.05,g)});
+ const mo=add(GSP,Mt('#7c4dff',{emissive:'#651fff',emissiveIntensity:1.6}),0,1.6,.98,.14,.14,.14,g);
+ add(GCY,gd,0,3.1,.1,.55,.14,.55,g);for(let k=0;k<5;k++){const t=k*1.2566;add(GCO,gd,Math.cos(t)*.48,3.32,.1+Math.sin(t)*.48,.1,.3,.1,g)}
+ for(let i=0;i<8;i++){const q=new THREE.Group();q.position.set(0,1.1,0);q.rotation.y=i*.785+.3;g.add(q);add(GCO,pu,.85,-.5,0,.28,1.9,.2,q).rotation.z=-2.3;add(GSP,dp,1.5,-.95,0,.16,.1,.16,q)}
+ const arm=s=>{const q=new THREE.Group();q.position.set(s*.8,1.6,.5);g.add(q);add(GCO,pu,s*.85,0,0,.26,1.7,.22,q).rotation.z=-s*1.57;return q};
+ g.userData={w1:arm(-1),w2:arm(1),mo};g.scale.setScalar(1.05);return g}
+function mkInk(){const g=new THREE.Group();add(GSP,Mt('#3b1d5a',{emissive:'#7c4dff',emissiveIntensity:.9,transparent:true,opacity:.95}),0,0,0,.55,.45,.45,g);add(GSP,Mt('#b388ff',{emissive:'#b388ff',emissiveIntensity:1.5}),.05,.05,.1,.22,.2,.2,g);add(GSP,Mt('#3b1d5a',{transparent:true,opacity:.7}),-.5,0,0,.3,.25,.25,g);add(GSP,Mt('#3b1d5a',{transparent:true,opacity:.5}),-.8,0,0,.18,.15,.15,g);return g}
+function mkFire(){if(th.k=='sea')return mkInk();const g=new THREE.Group();add(GSP,Mt('#ff6d00',{emissive:'#ff3d00',emissiveIntensity:1.8,transparent:true,opacity:.92}),0,0,0,.55,.45,.45,g);add(GSP,Mt('#ffeb3b',{emissive:'#ffd600',emissiveIntensity:2}),0,0,0,.3,.26,.26,g);add(GCO,Mt('#ff3d00',{emissive:'#ff3d00',emissiveIntensity:1.5}),-.45,0,0,.28,.6,.28,g).rotation.z=Math.PI/2;return g}
+function spawnBoss(){const b={x:L-420,y:GY-135,w:160,h:135,hp:4,a:L-560,b:L-300,vd:-1,ph:0,pt:0,hv:0,dir:-1,t:0,hit:0,br:0,sh:0,cd:70,dead:0,dying:0};b.m=th.k=='sea'?mkKraken():mkDragon();b.m.position.set(X(b.x+b.w/2),0,0);b.m.rotation.y=-1.4;S.add(b.m);boss=b;$('toast').textContent=th.k=='sea'?'🐙 Raja Gurita muncul! Ia berjalan & berenang. Tembak dia! 🔥':'🐉 Raja Naga muncul! Ia bisa berjalan & terbang. Tembak dengan bola api 🔥';toast=220}
+function stepBoss(){const b=boss;b.t++;b.pt++;if(b.hit>0)b.hit--;
+ if(b.ph==0){if(b.pt>300)b.ph=1}
+ else if(b.ph==1){b.hv+=2.5;if(b.hv>=105){b.hv=105;b.ph=2;b.pt=0}}
+ else if(b.ph==2){if(b.pt>340)b.ph=3}
+ else{b.hv-=2.5;if(b.hv<=0){b.hv=0;b.ph=0;b.pt=0}}
+ const fl=b.ph==1||b.ph==2,lo=fl?L-780:b.a;b.x+=b.vd*(b.ph==2?1.6:.8);if(b.x<lo)b.vd=1;if(b.x>b.b)b.vd=-1;
+ b.y=GY-135-b.hv-(b.ph==2?Math.sin(b.t*.06)*14:0);b.dir=P.x+P.w/2>b.x+b.w/2?1:-1;
+ if(--b.cd<=0){b.br=26;b.cd=b.hp<=2?95:140;b.sh=b.hp<=2?2:1}
+ if(b.br>0&&--b.br==0){bossFire();if(--b.sh>0)b.br=20}
+ if(hit(P,b)){hurt();P.x=P.x+P.w/2<b.x+b.w/2?b.x-P.w-2:b.x+b.w+2}}
+function bossFire(){const b=boss,d=b.dir,f={x:b.x+b.w/2+d*88-15,y:b.y+23,w:30,h:30,vx:(b.hp<=2?4.2:3.4)*d,vy:0,t:0};f.m=mkFire();S.add(f.m);BF.push(f)}
+function bossHit(){const b=boss;b.hp--;b.hit=14;score+=100;if(b.hp<=0){b.dead=1;b.dying=70;score+=500;BF.forEach(f=>f.dead=1);$('toast').textContent=th.k=='sea'?'🎉 Raja Gurita dikalahkan! Menuju bendera!':'🎉 Raja Naga dikalahkan! Menuju bendera!';toast=160}}
+function frame(){requestAnimationFrame(frame);if(!S)return;if(!over&&!paused)step();if(PL)sync();Rr.render(S,C)}
+</script></body></html>
